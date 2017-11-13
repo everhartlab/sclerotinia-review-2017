@@ -6,3 +6,4 @@ results/bootstrap.txt
 results/*docx
 results/*pdf
 results/*html
+code/*cache/
