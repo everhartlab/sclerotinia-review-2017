@@ -3,15 +3,33 @@ title: "MCG assessment of Kamvar et al 2017"
 author: "Zhian N. Kamvar"
 date: "`r Sys.Date()`"
 output: github_document
+bibliography: bibliography.bib
+editor_options: 
+  chunk_output_type: inline
 ---
 
 ```{r setup, include=FALSE}
+options(width = 90)
 knitr::opts_knit$set(root.dir = here::here())
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
 Introduction
 =============
+
+This document will test the hypothesis that mycelial compatibility groups will
+deliniate sexually recombining populations of *Sclerotinia sclerotiorum*. In
+this document, we are using data from @kamvar2017data, which consists of 366
+isolates of *S. sclerotiorum* sampled over 11 states in the United States of
+America, as well as Australia, France, and Mexico.
+
+If this hypothesis is true, we expect to find no signatures of linkage within
+the data before or after clone correction. We will be measuring clone-correction
+via the standardized index of association, $\bar{r}_d$ as implemented in the
+*poppr* package [@agapow2001indices; @kamvar2014poppr].
+
+Packages and Data
+-----------------
 
 Here we are loading the data and packages necessary for the analyses. 
 
@@ -34,11 +52,102 @@ dat <- readr::read_csv(here::here("data/kamvar2017population.csv"), col_types = 
 dat
 ```
 
-
+Since these are the data for the 16 loci, we only want to keep the 11 that were
+used for the study:
 
 ```{r}
-options(width = 100)
-devtools::session_info()
+replen <- c(
+"5-2(F)" = 2,
+"5-3(F)" = 4,
+"6-2(F)" = 5.99999,
+"7-2(F)" = 2,
+"8-3(H)" = 2,
+"9-2(F)" = 2,
+"12-2(H)" = 2,
+"17-3(H)" = 3,
+"20-3(F)" = 2,
+"36-4(F)" = 4,
+"50-4(F)" = 4,
+"55-4(F)" = 4,
+"92-4(F)" = 2,
+"106-4(H)" = 4,
+"110-4(H)" = 3.99999,
+"114-4(H)" = 4
+)
+loci_to_keep <- c("5-2(F)", "6-2(F)", "7-2(F)", "8-3(H)", "9-2(F)", "12-2(H)", 
+"17-3(H)", "20-3(F)", "55-4(F)", "110-4(H)", "114-4(H)")
+```
+
+Now we can use these to subset our data:
+
+```{r}
+dat11 <- dat %>% 
+  select(loci_to_keep) %>%
+  df2genind(strata = select(dat, Region, Source, Host, MCG, Year), 
+            ind.names = dat$Isolate,
+            ploidy = 1) %>%
+  as.genclone()
+stopifnot(nLoc(dat11) == 11L)
+stopifnot(nmll(dat11) == 165L)
+other(dat11)$REPLEN <- replen
+other(dat11)$meta <- dat %>% select(Severity, Isolate)
+setPop(dat11) <- ~Region
+dat11
+```
+
+Index of Association
+====================
+
+By MCG
+--------
+
+When we assess this by MCG, we need to first ensure that we are not drastically
+reducing our sample size because there is evidence that small sample sizes
+reduces the power of the index of association and can make clonal populations
+appear to be sexual.
+
+```{r by-mcg, cache = TRUE}
+dat11 %>% 
+  setPop(~MCG) %>%                   # set population to MCGs
+  selPopSize(n = 10) %>%             # constrain to 10 samples per population
+  poppr(sample = 999, total = FALSE) # test index of association for each pop
+```
+
+In terms of our hypothesis, that was underwhelming... What happens if we clone
+correct our data? We'll use the scheme in [@kamvar2017data], adding MCG as the
+highest level:
+
+```{r by-mcg-cc, cache = TRUE}
+dat11 %>% 
+  setPop(~MCG) %>%                   # set population to MCGs
+  selPopSize(n = 10) %>%             # constrain to 10 samples per population
+  clonecorrect(~MCG/Region/Source/Host/Year, keep = 1) %>%
+  poppr(sample = 999, total = FALSE) # test index of association for each pop
+```
+
+Okay, maybe that heirarchy is a bit... detailed. What happens if we go the
+opposite way? What if we simply clone-corrected just on MCG?
+
+```{r by-mcg-cc-bomb, cache = TRUE}
+dat11 %>% 
+  setPop(~MCG) %>%                   # set population to MCGs
+  selPopSize(n = 10) %>%             # constrain to 10 samples per population
+  clonecorrect(~MCG) %>% 
+  poppr(sample = 999, total = FALSE) # test index of association for each pop
 ```
 
 
+Welp.
+
+
+<details>
+<summary>Session Information</summary>
+
+```{r}
+devtools::session_info()
+```
+
+</details>
+
+References
+==========
