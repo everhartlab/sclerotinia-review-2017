@@ -7,3 +7,4 @@ results/*docx
 results/*pdf
 results/*html
 code/*cache/
+results/*_files/*docx*
