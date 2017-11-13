@@ -3,3 +3,6 @@
 .RData
 .Ruserdata
 results/bootstrap.txt
+results/*docx
+results/*pdf
+results/*html

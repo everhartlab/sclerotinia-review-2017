@@ -20,6 +20,8 @@ library("poppr")
 library("tidyverse")
 ```
 
+Now that the packages are loaded, we can load the data:
+
 ```{r}
 data_cols <- cols(
   .default = col_integer(),

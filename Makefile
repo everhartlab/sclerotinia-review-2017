@@ -23,10 +23,10 @@ results/%.html : code/%.Rmd
 	                                output_format = rmarkdown::html_document(), \
 	                                knit_root_dir = here::here(),               \
 	                                )"
-results/%.docx : code/%.Rmd
+results/%.docx : code/%.Rmd code/template.docx
 	R --slave -e "rmarkdown::render(input = '$<',                               \
 	                                output_dir = '$(@D)',                       \
-	                                output_format = rmarkdown::word_document(), \
+	                                output_format = rmarkdown::word_document(reference_docx = here::here('code/template.docx')), \
 	                                knit_root_dir = here::here(),               \
 	                                )"
 
