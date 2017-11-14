@@ -137,7 +137,9 @@ dat11 %>%
 ```
 
 
-Welp.
+Okay. So far, we have no evidence for this hypothesis. But one of the issues
+that we saw in Kamvar et al. 2017 was that these data reflected a clonal
+population structure.  
 
 
 <details>
