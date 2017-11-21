@@ -364,11 +364,11 @@ We can see how they all are related (or not so) to each other
 
 
 ```r
-aboot(test, ~pop, sample = 999, dist = "nei.dist")
+aboot(test, ~pop, sample = 1000, dist = "nei.dist")
 ```
 
 ```
-## Running bootstraps:       100 / 999Running bootstraps:       200 / 999Running bootstraps:       300 / 999Running bootstraps:       400 / 999Running bootstraps:       500 / 999Running bootstraps:       600 / 999Running bootstraps:       700 / 999Running bootstraps:       800 / 999Running bootstraps:       900 / 999
+## Running bootstraps:       100 / 1000Running bootstraps:       200 / 1000Running bootstraps:       300 / 1000Running bootstraps:       400 / 1000Running bootstraps:       500 / 1000Running bootstraps:       600 / 1000Running bootstraps:       700 / 1000Running bootstraps:       800 / 1000Running bootstraps:       900 / 1000Running bootstraps:       1000 / 1000
 ## Calculating bootstrap values... done.
 ```
 
@@ -381,7 +381,7 @@ aboot(test, ~pop, sample = 999, dist = "nei.dist")
 ## Tip labels:
 ## 	unknown_1, unknown_2, unknown_3, unknown_4, unknown_5, unknown_6, ...
 ## Node labels:
-## 	100, 45.7457457457458, 20.7207207207207, 8.20820820820821, 4.8048048048048, 35.4354354354354, ...
+## 	100, 45.8, 20.8, 8.2, 4.8, 35.5, ...
 ## 
 ## Rooted; includes branch lengths.
 ```
@@ -439,7 +439,11 @@ sum(resdf$p.rD <= 0.05)/nrow(resdf)
 ## [1] 0.56
 ```
 
+That's quite a lot!
+
 What do the data look like:
+
+
 
 
 ```r
