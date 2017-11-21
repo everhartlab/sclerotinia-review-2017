@@ -139,7 +139,104 @@ dat11 %>%
 
 Okay. So far, we have no evidence for this hypothesis. But one of the issues
 that we saw in Kamvar et al. 2017 was that these data reflected a clonal
-population structure.  
+population structure. One thing that I'm curious about is the results that were
+obtained by @prugnolle2010apparent showing that individuals sampled from 
+differentiated populations will have a lower index of association. I can test
+this by simulating data.
+
+
+Data Simulations
+----------------
+
+I've written a simulator in the accompanying R script `pop_generator.R` and am
+loading it here.
+
+```{r load-pg}
+source("code/pop_generator.R")
+```
+
+First step is to create some populations. I'm choosing to go through 7 rounds of
+clonal reproduction to create 10 populations.
+
+```{r create-population, cache = TRUE}
+set.seed(2017-11-21)
+test <- replicate(10, pop_generator(clone_gen = 7, mu = 0.5)) %>%
+  repool() %>%
+  as.genclone()
+strata(test) <- data.frame(pop = pop(test))
+test
+nAll(test)
+```
+
+We can see from this that the clonal reproduction reduced the number of unique
+individuals quite a bit. If we test the index of association for these
+populations, we can see that they are indeed clonal:
+
+```{r ia-sims, cache = TRUE}
+poppr(test, total = FALSE, sample = 999)
+poppr(test, clonecorrect = TRUE, total = FALSE, strata = ~pop, sample = 999)
+```
+
+We can see how they all are related (or not so) to each other
+
+```{r ia-aboot, cache = TRUE}
+aboot(test, ~pop, sample = 1000, dist = "nei.dist")
+```
+
+Now that we've set up the popualtions, we can randomly sample two individuals
+from each and pool them together.
+
+```{r resample_popualtions, cache = TRUE}
+sample_two <- quote(flatten_dbl(map(popNames(test), ~{ sample(which(pop(test) == .), 2) })))
+subsamples <- replicate(100, test[eval(sample_two), ])
+```
+
+```{r calculate_ia, cache = TRUE}
+p <- dplyr::progress_estimated(length(subsamples))
+res <- map(subsamples, ~{
+  p$tick()$print()
+  ia(., sample = 999, valuereturn = TRUE, plot = FALSE, quiet = TRUE)
+})
+p$stop()
+
+resdf <- map(res, 1) %>% 
+  map(as.list) %>% 
+  bind_rows()
+(resdf <- bind_cols(resdf, data_frame(sims = map(res, 2))))
+```
+
+Now we can see what fraction of the simulations resulted in a significant value
+of $\bar{r}_d$
+
+```{r}
+sum(resdf$p.rD <= 0.05)/nrow(resdf)
+```
+
+That's quite a lot!
+
+What do the data look like:
+
+
+
+```{r fig.width = 10, fig.height = 5}
+ccia <- poppr(test, quiet = TRUE, total = FALSE)
+resdf %>% 
+  ggplot(aes(x = rbarD, fill = p.rD >= 0.05)) + 
+  geom_histogram(binwidth = 0.01, position = "stack", color = "black") +
+  geom_rug(aes(color = p.rD)) +
+  viridis::scale_color_viridis() +
+  scale_fill_manual(values = c("grey30", "grey80")) +
+  geom_vline(xintercept = ccia$rbarD, lty = 3) +
+  theme_bw(base_size = 16, base_family = "Helvetica") +
+  labs(list(
+    fill = expression(paste("p >= 0.05")),
+    color = "p-value",
+    x = expression(paste(bar(r)[d])),
+    title = "The index of association of mixed population samples",
+    subtitle = "100 replicates; 10 populations; 2 individuals from each population",
+    caption = expression(paste("(dashed lines: observed ", bar(r)[d], " values)"))
+  ))
+```
 
 
 <details>
