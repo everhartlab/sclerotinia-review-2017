@@ -1,7 +1,7 @@
 ---
 title: "MCG assessment of Kamvar et al 2017"
 author: "Zhian N. Kamvar"
-date: "2017-11-14"
+date: "2017-11-21"
 output: github_document
 bibliography: bibliography.bib
 editor_options: 
@@ -220,7 +220,249 @@ dat11 %>%
 
 Okay. So far, we have no evidence for this hypothesis. But one of the issues
 that we saw in Kamvar et al. 2017 was that these data reflected a clonal
-population structure.  
+population structure. One thing that I'm curious about is the results that were
+obtained by @prugnolle2010apparent showing that individuals sampled from 
+differentiated populations will have a lower index of association. I can test
+this by simulating data.
+
+
+Data Simulations
+----------------
+
+I've written a simulator in the accompanying R script `pop_generator.R` and am
+loading it here.
+
+
+```r
+source("code/pop_generator.R")
+```
+
+```
+## pop_generator is loaded.
+## 
+## USAGE:
+```
+
+```
+## pop_generator(n = 100, ploidy = 1, freq = NULL, nall = sample(4:12, 11, replace = TRUE), clone_gen = 0, mu = 0.05, verbose = TRUE, genclone = TRUE)
+```
+
+First step is to create some populations. I'm choosing to go through 7 rounds of
+clonal reproduction to create 10 populations.
+
+
+```r
+set.seed(2017-11-21)
+test <- replicate(10, pop_generator(clone_gen = 7, mu = 0.5)) %>%
+  repool() %>%
+  as.genclone()
+```
+
+```
+## I recorded 3 mutation events
+## I recorded 2 mutation events
+## I recorded 5 mutation events
+## I recorded 3 mutation events
+## I recorded 0 mutation events
+## I recorded 1 mutation events
+## I recorded 3 mutation events
+## I recorded 2 mutation events
+## I recorded 3 mutation events
+## I recorded 1 mutation events
+```
+
+```r
+strata(test) <- data.frame(pop = pop(test))
+test
+```
+
+```
+## 
+## This is a genclone object
+## -------------------------
+## Genotype information:
+## 
+##     221 original multilocus genotypes 
+##    1000 haploid individuals
+##      11 codominant loci
+## 
+## Population information:
+## 
+##       1 stratum - pop
+##      10 populations defined - 
+## unknown_1, unknown_2, unknown_3, ..., unknown_8, unknown_9, unknown_10
+```
+
+```r
+nAll(test)
+```
+
+```
+##  locus 1  locus 2  locus 3  locus 4  locus 5  locus 6  locus 7  locus 8  locus 9 locus 10 
+##       11       12       12        9       12       12       11        9       12       10 
+## locus 11 
+##       12
+```
+
+We can see from this that the clonal reproduction reduced the number of unique
+individuals quite a bit. If we test the index of association for these
+populations, we can see that they are indeed clonal:
+
+
+```r
+poppr(test, total = FALSE, sample = 999)
+```
+
+![plot of chunk ia-sims](./figures/kamvar2017population//ia-sims-1.png)
+
+```
+##           Pop   N MLG eMLG SE    H    G lambda   E.5  Hexp   Ia  p.Ia rbarD  p.rD File
+## 1   unknown_1 100  24   24  0 3.02 18.2  0.945 0.887 0.763 1.45 0.001 0.147 0.001 test
+## 2   unknown_2 100  23   23  0 2.79 12.5  0.920 0.754 0.749 2.41 0.001 0.243 0.001 test
+## 3   unknown_3 100  22   22  0 2.73 12.7  0.921 0.813 0.771 2.66 0.001 0.268 0.001 test
+## 4   unknown_4 100  28   28  0 3.11 18.6  0.946 0.824 0.799 1.77 0.001 0.179 0.001 test
+## 5   unknown_5 100  20   20  0 2.71 12.9  0.923 0.848 0.717 2.13 0.001 0.218 0.001 test
+## 6   unknown_6 100  17   17  0 2.50 10.0  0.900 0.803 0.723 2.49 0.001 0.252 0.001 test
+## 7   unknown_7 100  17   17  0 2.63 12.4  0.919 0.879 0.748 2.37 0.001 0.242 0.001 test
+## 8   unknown_8 100  25   25  0 2.97 16.0  0.938 0.810 0.767 2.01 0.001 0.202 0.001 test
+## 9   unknown_9 100  20   20  0 2.59 11.1  0.910 0.812 0.709 2.29 0.001 0.232 0.001 test
+## 10 unknown_10 100  25   25  0 2.98 16.5  0.939 0.833 0.763 1.77 0.001 0.180 0.001 test
+```
+
+```r
+poppr(test, clonecorrect = TRUE, total = FALSE, strata = ~pop, sample = 999)
+```
+
+![plot of chunk ia-sims](./figures/kamvar2017population//ia-sims-2.png)
+
+```
+##           Pop  N MLG eMLG       SE    H  G lambda E.5  Hexp      Ia  p.Ia    rbarD  p.rD
+## 1   unknown_1 24  24   17 0.00e+00 3.18 24  0.958   1 0.796 -0.0937 0.882 -0.00956 0.882
+## 2   unknown_2 23  23   17 0.00e+00 3.14 23  0.957   1 0.797  0.0718 0.192  0.00732 0.192
+## 3   unknown_3 22  22   17 3.40e-07 3.09 22  0.955   1 0.824  0.3369 0.001  0.03424 0.001
+## 4   unknown_4 28  28   17 0.00e+00 3.33 28  0.964   1 0.842  0.1791 0.070  0.01825 0.070
+## 5   unknown_5 20  20   17 1.07e-07 3.00 20  0.950   1 0.777  0.0658 0.244  0.00693 0.244
+## 6   unknown_6 17  17   17 0.00e+00 2.83 17  0.941   1 0.793 -0.0844 0.768 -0.00884 0.768
+## 7   unknown_7 17  17   17 0.00e+00 2.83 17  0.941   1 0.810  0.0829 0.220  0.00866 0.220
+## 8   unknown_8 25  25   17 4.73e-07 3.22 25  0.960   1 0.797  0.1176 0.086  0.01194 0.086
+## 9   unknown_9 20  20   17 1.07e-07 3.00 20  0.950   1 0.769  0.2008 0.031  0.02075 0.031
+## 10 unknown_10 25  25   17 4.73e-07 3.22 25  0.960   1 0.806 -0.0764 0.851 -0.00791 0.851
+##    File
+## 1  test
+## 2  test
+## 3  test
+## 4  test
+## 5  test
+## 6  test
+## 7  test
+## 8  test
+## 9  test
+## 10 test
+```
+
+We can see how they all are related (or not so) to each other
+
+
+```r
+aboot(test, ~pop, sample = 999, dist = "nei.dist")
+```
+
+```
+## Running bootstraps:       100 / 999Running bootstraps:       200 / 999Running bootstraps:       300 / 999Running bootstraps:       400 / 999Running bootstraps:       500 / 999Running bootstraps:       600 / 999Running bootstraps:       700 / 999Running bootstraps:       800 / 999Running bootstraps:       900 / 999
+## Calculating bootstrap values... done.
+```
+
+![plot of chunk ia-aboot](./figures/kamvar2017population//ia-aboot-1.png)
+
+```
+## 
+## Phylogenetic tree with 10 tips and 9 internal nodes.
+## 
+## Tip labels:
+## 	unknown_1, unknown_2, unknown_3, unknown_4, unknown_5, unknown_6, ...
+## Node labels:
+## 	100, 45.7457457457458, 20.7207207207207, 8.20820820820821, 4.8048048048048, 35.4354354354354, ...
+## 
+## Rooted; includes branch lengths.
+```
+
+Now that we've set up the popualtions, we can randomly sample two individuals
+from each and pool them together.
+
+
+```r
+sample_two <- quote(flatten_dbl(map(popNames(test), ~{ sample(which(pop(test) == .), 2) })))
+subsamples <- replicate(100, test[eval(sample_two), ])
+```
+
+
+```r
+p <- dplyr::progress_estimated(length(subsamples))
+res <- map(subsamples, ~{
+  p$tick()$print()
+  ia(., sample = 999, valuereturn = TRUE, plot = FALSE, quiet = TRUE)
+})
+p$stop()
+
+resdf <- map(res, 1) %>% 
+  map(as.list) %>% 
+  bind_rows()
+(resdf <- bind_cols(resdf, data_frame(sims = map(res, 2))))
+```
+
+```
+## # A tibble: 100 x 5
+##             Ia  p.Ia        rbarD  p.rD                   sims
+##          <dbl> <dbl>        <dbl> <dbl>                 <list>
+##  1  0.21039302 0.032  0.021247657 0.032 <data.frame [999 x 2]>
+##  2  0.42522718 0.001  0.042789229 0.001 <data.frame [999 x 2]>
+##  3  0.45001788 0.001  0.045507524 0.001 <data.frame [999 x 2]>
+##  4  0.19283401 0.033  0.019530412 0.033 <data.frame [999 x 2]>
+##  5  0.08062331 0.209  0.008183942 0.209 <data.frame [999 x 2]>
+##  6  0.15492112 0.374  0.015778779 0.374 <data.frame [999 x 2]>
+##  7 -0.01118965 0.529 -0.001126808 0.529 <data.frame [999 x 2]>
+##  8  0.10354491 0.170  0.010551664 0.170 <data.frame [999 x 2]>
+##  9  0.67430751 0.001  0.068084058 0.001 <data.frame [999 x 2]>
+## 10  0.22415784 0.021  0.022824349 0.021 <data.frame [999 x 2]>
+## # ... with 90 more rows
+```
+
+Now we can see what fraction of the simulations resulted in a significant value
+of $\bar{r}_d$
+
+
+```r
+sum(resdf$p.rD <= 0.05)/nrow(resdf)
+```
+
+```
+## [1] 0.56
+```
+
+What do the data look like:
+
+
+```r
+ccia <- poppr(test, quiet = TRUE, total = FALSE)
+resdf %>% 
+  ggplot(aes(x = rbarD, fill = p.rD >= 0.05)) + 
+  geom_histogram(binwidth = 0.01, position = "stack", color = "black") +
+  geom_rug(aes(color = p.rD)) +
+  viridis::scale_color_viridis() +
+  scale_fill_manual(values = c("grey30", "grey80")) +
+  geom_vline(xintercept = ccia$rbarD, lty = 3) +
+  theme_bw(base_size = 16, base_family = "Helvetica") +
+  labs(list(
+    fill = expression(paste("p >= 0.05")),
+    color = "p-value",
+    x = expression(paste(bar(r)[d])),
+    title = "The index of association of mixed population samples",
+    subtitle = "100 replicates; 10 populations; 2 individuals from each population",
+    caption = expression(paste("(dashed lines: observed ", bar(r)[d], " values)"))
+  ))
+```
+
+![plot of chunk unnamed-chunk-6](./figures/kamvar2017population//unnamed-chunk-6-1.png)
 
 
 <details>
@@ -243,7 +485,7 @@ devtools::session_info()
 ##  language (EN)                        
 ##  collate  en_US.UTF-8                 
 ##  tz       America/Chicago             
-##  date     2017-11-14
+##  date     2017-11-21
 ```
 
 ```
@@ -252,7 +494,7 @@ devtools::session_info()
 
 ```
 ##  package     * version     date       source                             
-##  ade4        * 1.7-8       2017-11-02 Github (sdray/ade4@4348204)        
+##  ade4        * 1.7-8       2017-11-19 Github (sdray/ade4@2ee45cb)        
 ##  adegenet    * 2.1.1       2017-10-30 local                              
 ##  ape           5.0         2017-10-30 CRAN (R 3.4.2)                     
 ##  assertthat    0.2.0       2017-04-11 CRAN (R 3.4.0)                     
@@ -288,6 +530,7 @@ devtools::session_info()
 ##  graphics    * 3.4.2       2017-10-04 local                              
 ##  grDevices   * 3.4.2       2017-10-04 local                              
 ##  grid          3.4.2       2017-10-04 local                              
+##  gridExtra     2.3         2017-09-09 CRAN (R 3.4.1)                     
 ##  gtable        0.2.0       2016-02-26 CRAN (R 3.4.0)                     
 ##  gtools        3.5.0       2015-05-29 CRAN (R 3.4.0)                     
 ##  haven         1.1.0       2017-07-09 CRAN (R 3.4.1)                     
@@ -322,7 +565,7 @@ devtools::session_info()
 ##  phangorn      2.3.1       2017-11-01 CRAN (R 3.4.2)                     
 ##  pkgconfig     2.0.1       2017-03-21 CRAN (R 3.4.0)                     
 ##  plyr          1.8.4       2016-06-08 CRAN (R 3.4.0)                     
-##  poppr       * 2.5.0.99-12 2017-11-09 local                              
+##  poppr       * 2.5.0.99-29 2017-11-19 Github (grunwaldlab/poppr@21440e6) 
 ##  psych         1.7.8       2017-09-09 CRAN (R 3.4.1)                     
 ##  purrr       * 0.2.4       2017-10-18 cran (@0.2.4)                      
 ##  quadprog      1.5-5       2013-04-17 CRAN (R 3.4.0)                     
@@ -330,7 +573,7 @@ devtools::session_info()
 ##  R.oo          1.21.0      2016-11-01 CRAN (R 3.4.0)                     
 ##  R.utils       2.6.0       2017-11-05 CRAN (R 3.4.2)                     
 ##  R6            2.2.2       2017-06-17 cran (@2.2.2)                      
-##  Rcpp          0.12.13.1   2017-10-10 Github (RcppCore/Rcpp@136d50f)     
+##  Rcpp          0.12.13     2017-09-28 CRAN (R 3.4.2)                     
 ##  readr       * 1.1.1       2017-05-16 CRAN (R 3.4.0)                     
 ##  readxl        1.0.0       2017-04-18 CRAN (R 3.4.0)                     
 ##  reshape2      1.4.2       2016-10-22 CRAN (R 3.4.0)                     
@@ -353,6 +596,8 @@ devtools::session_info()
 ##  tools         3.4.2       2017-10-04 local                              
 ##  utils       * 3.4.2       2017-10-04 local                              
 ##  vegan         2.4-4       2017-08-24 cran (@2.4-4)                      
+##  viridis       0.4.0       2017-03-27 CRAN (R 3.4.0)                     
+##  viridisLite   0.2.0       2017-03-24 CRAN (R 3.4.0)                     
 ##  withr         2.1.0       2017-11-01 CRAN (R 3.4.2)                     
 ##  xml2          1.1.1       2017-01-24 CRAN (R 3.4.0)                     
 ##  xtable        1.8-2       2016-02-05 CRAN (R 3.4.0)
