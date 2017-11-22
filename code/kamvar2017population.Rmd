@@ -148,57 +148,88 @@ this by simulating data.
 Data Simulations
 ----------------
 
-I've written a simulator in the accompanying R script `pop_generator.R` and am
-loading it here.
+I've written a simulator in an R package called "kop" and am loading it here:
 
 ```{r load-pg}
-source("code/pop_generator.R")
+library("doParallel")
+library("kop")
 ```
 
-First step is to create some populations. I'm choosing to go through 7 rounds of
-clonal reproduction to create 10 populations.
+First step is to create some populations. Because I want to get a representative
+from each population, I'm going to create 20 populations. These populations are
+initially simulated from a multinomial distribution, but this often results in
+extremely long branches for a tree:
+
+```{r example_sim}
+kop::pop_generator(mate_gen = 0, mu = 0.5) %>% 
+  aboot(sample = 1, tree = "nj", dist = "dist", quiet = TRUE) %>%
+  invisible()
+```
+
+
+To avoid this, I'm parameterizing the simulations thusly:
+
+| Parameter | Value |
+| --------- | ----- |
+| Census Size | 1000 |
+| Sample Size | 100 |
+| Generations of random mating | 400 |
+| Generations of clonal reproduction (after random mating) | 100 |
+| Mutations/Generation (over all samples/loci) | 0.5 |
+
+The random mating serves to shorten those long terminal branches. This is
+important for ensuring that the populations we DO simulate are sufficiently 
+different from each other.
 
 ```{r create-population, cache = TRUE}
+cl <- makeCluster(4)
+registerDoParallel(cl, cores = 4)
 set.seed(2017-11-21)
-test <- replicate(10, pop_generator(clone_gen = 7, mu = 0.5)) %>%
+test <- foreach(seq_len(20), .combine = c, .packages = c("kop", "poppr", "dplyr", "purrr", "tibble")) %dopar% 
+  pop_generator(n = 1000, mate_gen = 400, clone_gen = 100, mu = 0.5, verbose = FALSE)
+stopCluster(cl)
+test <- test %>%
   repool() %>%
   as.genclone()
 strata(test) <- data.frame(pop = pop(test))
 test
 nAll(test)
+plot(ape::nj(dist(test)), lab4ut = "axial", type = "unrooted", tip.col = adegenet::funky(nPop(test))[pop(test)])
 ```
 
 We can see from this that the clonal reproduction reduced the number of unique
 individuals quite a bit. If we test the index of association for these
 populations, we can see that they are indeed clonal:
 
-```{r ia-sims, cache = TRUE}
-poppr(test, total = FALSE, sample = 999)
+```{r ia-sims, cache = TRUE, dependson = "create-population"}
+poppr(test, total = FALSE, sample = 999) 
 poppr(test, clonecorrect = TRUE, total = FALSE, strata = ~pop, sample = 999)
 ```
 
 We can see how they all are related (or not so) to each other
 
-```{r ia-aboot, cache = TRUE}
-aboot(test, ~pop, sample = 1000, dist = "nei.dist")
+```{r ia-aboot, cache = TRUE, dependson = "create-population"}
+aboot(test, ~pop, sample = 1000, dist = "nei.dist", tree = "nj")
 ```
 
 Now that we've set up the popualtions, we can randomly sample two individuals
 from each and pool them together.
 
-```{r resample_popualtions, cache = TRUE}
-sample_two <- quote(flatten_dbl(map(popNames(test), ~{ sample(which(pop(test) == .), 2) })))
-subsamples <- replicate(100, test[eval(sample_two), ])
+```{r resample_popualtions, cache = TRUE, dependson = "create-population"}
+# Sample one individual per population
+sample_one <- quote(flatten_dbl(map(popNames(test), ~{ sample(which(pop(test) == .), 1) })))
+subsamples <- replicate(100, test[eval(sample_one), ])
 ```
 
-```{r calculate_ia, cache = TRUE}
-p <- dplyr::progress_estimated(length(subsamples))
-res <- map(subsamples, ~{
-  p$tick()$print()
-  ia(., sample = 999, valuereturn = TRUE, plot = FALSE, quiet = TRUE)
-})
-p$stop()
+```{r calculate_ia, cache = TRUE, dependson = "resample_populations"}
+cl <- makeCluster(4)
+registerDoParallel(cl, cores = 4)
+set.seed(2017-11-21)
+res <- foreach(i = seq(subsamples), .combine = c, .packages = c("poppr")) %dopar% 
+  list(ia(subsamples[[i]], sample = 999, valuereturn = TRUE, plot = FALSE, quiet = TRUE))
+stopCluster(cl)
 
+# reshaping everything into a data frame
 resdf <- map(res, 1) %>% 
   map(as.list) %>% 
   bind_rows()
@@ -208,17 +239,15 @@ resdf <- map(res, 1) %>%
 Now we can see what fraction of the simulations resulted in a significant value
 of $\bar{r}_d$
 
-```{r}
+```{r, dependson = "resample_populations"}
 sum(resdf$p.rD <= 0.05)/nrow(resdf)
 ```
 
-That's quite a lot!
+That's not very many.
 
 What do the data look like:
 
-
-
-```{r fig.width = 10, fig.height = 5}
+```{r fig.width = 10, fig.height = 5, dependson = "resample_populations"}
 ccia <- poppr(test, quiet = TRUE, total = FALSE)
 resdf %>% 
   ggplot(aes(x = rbarD, fill = p.rD >= 0.05)) + 
@@ -233,7 +262,7 @@ resdf %>%
     color = "p-value",
     x = expression(paste(bar(r)[d])),
     title = "The index of association of mixed population samples",
-    subtitle = "100 replicates; 10 populations; 2 individuals from each population",
+    subtitle = "100 replicates; 20 populations; 1 individual from each population",
     caption = expression(paste("(dashed lines: observed ", bar(r)[d], " values)"))
   ))
 ```

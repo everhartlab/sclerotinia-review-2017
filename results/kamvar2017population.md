@@ -1,7 +1,7 @@
 ---
 title: "MCG assessment of Kamvar et al 2017"
 author: "Zhian N. Kamvar"
-date: "2017-11-21"
+date: "2017-11-22"
 output: github_document
 bibliography: bibliography.bib
 editor_options: 
@@ -229,49 +229,89 @@ this by simulating data.
 Data Simulations
 ----------------
 
-I've written a simulator in the accompanying R script `pop_generator.R` and am
-loading it here.
+I've written a simulator in an R package called "kop" and am loading it here:
 
 
 ```r
-source("code/pop_generator.R")
+library("doParallel")
 ```
 
 ```
-## pop_generator is loaded.
+## Loading required package: foreach
+```
+
+```
 ## 
-## USAGE:
+## Attaching package: 'foreach'
 ```
 
 ```
-## pop_generator(n = 100, ploidy = 1, freq = NULL, nall = sample(4:12, 11, replace = TRUE), clone_gen = 0, mu = 0.05, verbose = TRUE, genclone = TRUE)
+## The following objects are masked from 'package:purrr':
+## 
+##     accumulate, when
 ```
 
-First step is to create some populations. I'm choosing to go through 7 rounds of
-clonal reproduction to create 10 populations.
+```
+## Loading required package: iterators
+```
+
+```
+## Loading required package: parallel
+```
+
+```r
+library("kop")
+```
+
+First step is to create some populations. Because I want to get a representative
+from each population, I'm going to create 20 populations. These populations are
+initially simulated from a multinomial distribution, but this often results in
+extremely long branches for a tree:
 
 
 ```r
+kop::pop_generator(mate_gen = 0, mu = 0.5) %>% 
+  aboot(sample = 1, tree = "nj", dist = "dist", quiet = TRUE) %>%
+  invisible()
+```
+
+```
+## Beginning mating
+```
+
+```
+## 
+## I recorded 0 mutation events
+```
+
+![plot of chunk example_sim](./figures/kamvar2017population//example_sim-1.png)
+
+
+To avoid this, I'm parameterizing the simulations thusly:
+
+| Parameter | Value |
+| --------- | ----- |
+| Census Size | 1000 |
+| Sample Size | 100 |
+| Generations of random mating | 400 |
+| Generations of clonal reproduction (after random mating) | 100 |
+| Mutations/Generation (over all samples/loci) | 0.5 |
+
+The random mating serves to shorten those long terminal branches. This is
+important for ensuring that the populations we DO simulate are sufficiently 
+different from each other.
+
+
+```r
+cl <- makeCluster(4)
+registerDoParallel(cl, cores = 4)
 set.seed(2017-11-21)
-test <- replicate(10, pop_generator(clone_gen = 7, mu = 0.5)) %>%
+test <- foreach(seq_len(20), .combine = c, .packages = c("kop", "poppr", "dplyr", "purrr", "tibble")) %dopar% 
+  pop_generator(n = 1000, mate_gen = 400, clone_gen = 100, mu = 0.5, verbose = FALSE)
+stopCluster(cl)
+test <- test %>%
   repool() %>%
   as.genclone()
-```
-
-```
-## I recorded 3 mutation events
-## I recorded 2 mutation events
-## I recorded 5 mutation events
-## I recorded 3 mutation events
-## I recorded 0 mutation events
-## I recorded 1 mutation events
-## I recorded 3 mutation events
-## I recorded 2 mutation events
-## I recorded 3 mutation events
-## I recorded 1 mutation events
-```
-
-```r
 strata(test) <- data.frame(pop = pop(test))
 test
 ```
@@ -282,15 +322,15 @@ test
 ## -------------------------
 ## Genotype information:
 ## 
-##     221 original multilocus genotypes 
-##    1000 haploid individuals
+##     361 original multilocus genotypes 
+##    2000 haploid individuals
 ##      11 codominant loci
 ## 
 ## Population information:
 ## 
 ##       1 stratum - pop
-##      10 populations defined - 
-## unknown_1, unknown_2, unknown_3, ..., unknown_8, unknown_9, unknown_10
+##      20 populations defined - 
+## unknown_1, unknown_2, unknown_3, ..., unknown_18, unknown_19, unknown_20
 ```
 
 ```r
@@ -299,10 +339,16 @@ nAll(test)
 
 ```
 ##  locus 1  locus 2  locus 3  locus 4  locus 5  locus 6  locus 7  locus 8  locus 9 locus 10 
-##       11       12       12        9       12       12       11        9       12       10 
+##       12       12       12       11       11       12       11       11       11       11 
 ## locus 11 
 ##       12
 ```
+
+```r
+plot(ape::nj(dist(test)), lab4ut = "axial", type = "unrooted", tip.col = adegenet::funky(nPop(test))[pop(test)])
+```
+
+![plot of chunk create-population](./figures/kamvar2017population//create-population-1.png)
 
 We can see from this that the clonal reproduction reduced the number of unique
 individuals quite a bit. If we test the index of association for these
@@ -310,23 +356,33 @@ populations, we can see that they are indeed clonal:
 
 
 ```r
-poppr(test, total = FALSE, sample = 999)
+poppr(test, total = FALSE, sample = 999) 
 ```
 
 ![plot of chunk ia-sims](./figures/kamvar2017population//ia-sims-1.png)
 
 ```
-##           Pop   N MLG eMLG SE    H    G lambda   E.5  Hexp   Ia  p.Ia rbarD  p.rD File
-## 1   unknown_1 100  24   24  0 3.02 18.2  0.945 0.887 0.763 1.45 0.001 0.147 0.001 test
-## 2   unknown_2 100  23   23  0 2.79 12.5  0.920 0.754 0.749 2.41 0.001 0.243 0.001 test
-## 3   unknown_3 100  22   22  0 2.73 12.7  0.921 0.813 0.771 2.66 0.001 0.268 0.001 test
-## 4   unknown_4 100  28   28  0 3.11 18.6  0.946 0.824 0.799 1.77 0.001 0.179 0.001 test
-## 5   unknown_5 100  20   20  0 2.71 12.9  0.923 0.848 0.717 2.13 0.001 0.218 0.001 test
-## 6   unknown_6 100  17   17  0 2.50 10.0  0.900 0.803 0.723 2.49 0.001 0.252 0.001 test
-## 7   unknown_7 100  17   17  0 2.63 12.4  0.919 0.879 0.748 2.37 0.001 0.242 0.001 test
-## 8   unknown_8 100  25   25  0 2.97 16.0  0.938 0.810 0.767 2.01 0.001 0.202 0.001 test
-## 9   unknown_9 100  20   20  0 2.59 11.1  0.910 0.812 0.709 2.29 0.001 0.232 0.001 test
-## 10 unknown_10 100  25   25  0 2.98 16.5  0.939 0.833 0.763 1.77 0.001 0.180 0.001 test
+##           Pop   N MLG eMLG SE    H     G lambda   E.5  Hexp    Ia  p.Ia  rbarD  p.rD File
+## 1   unknown_1 100  20   20  0 2.67 11.85  0.916 0.811 0.486 1.211 0.001 0.1242 0.001 test
+## 2   unknown_2 100  18   18  0 2.71 13.51  0.926 0.893 0.472 0.569 0.001 0.0633 0.001 test
+## 3   unknown_3 100  15   15  0 2.11  5.95  0.832 0.682 0.437 1.897 0.001 0.2110 0.001 test
+## 4   unknown_4 100  21   21  0 2.74 12.82  0.922 0.815 0.452 0.656 0.001 0.0760 0.001 test
+## 5   unknown_5 100  21   21  0 2.64 10.46  0.904 0.730 0.529 1.083 0.001 0.1084 0.001 test
+## 6   unknown_6 100  15   15  0 2.32  7.94  0.874 0.752 0.502 1.524 0.001 0.1559 0.001 test
+## 7   unknown_7 100  19   19  0 2.70 12.17  0.918 0.804 0.468 0.958 0.001 0.0970 0.001 test
+## 8   unknown_8 100  15   15  0 2.36  8.36  0.880 0.768 0.458 1.021 0.001 0.1045 0.001 test
+## 9   unknown_9 100  16   16  0 2.50 10.18  0.902 0.822 0.581 1.735 0.001 0.1741 0.001 test
+## 10 unknown_10 100  19   19  0 2.63 11.01  0.909 0.781 0.420 0.602 0.001 0.0670 0.001 test
+## 11 unknown_11 100  17   17  0 2.54 10.66  0.906 0.829 0.596 1.298 0.001 0.1300 0.001 test
+## 12 unknown_12 100  22   22  0 2.79 13.37  0.925 0.813 0.588 1.070 0.001 0.1075 0.001 test
+## 13 unknown_13 100  14   14  0 2.37  8.87  0.887 0.807 0.534 1.240 0.001 0.1379 0.001 test
+## 14 unknown_14 100  18   18  0 2.62 11.11  0.910 0.797 0.466 1.429 0.001 0.1563 0.001 test
+## 15 unknown_15 100  19   19  0 2.71 13.05  0.923 0.859 0.553 1.038 0.001 0.1038 0.001 test
+## 16 unknown_16 100  17   17  0 2.58 11.44  0.913 0.857 0.461 1.223 0.001 0.1232 0.001 test
+## 17 unknown_17 100  23   23  0 2.85 13.77  0.927 0.786 0.517 0.708 0.001 0.0715 0.001 test
+## 18 unknown_18 100  18   18  0 2.63 11.60  0.914 0.821 0.570 1.356 0.001 0.1361 0.001 test
+## 19 unknown_19 100  17   17  0 2.55 10.96  0.909 0.842 0.495 1.103 0.001 0.1172 0.001 test
+## 20 unknown_20 100  17   17  0 2.60 11.01  0.909 0.799 0.475 0.883 0.001 0.0990 0.001 test
 ```
 
 ```r
@@ -336,39 +392,135 @@ poppr(test, clonecorrect = TRUE, total = FALSE, strata = ~pop, sample = 999)
 ![plot of chunk ia-sims](./figures/kamvar2017population//ia-sims-2.png)
 
 ```
-##           Pop  N MLG eMLG       SE    H  G lambda E.5  Hexp      Ia  p.Ia    rbarD  p.rD
-## 1   unknown_1 24  24   17 0.00e+00 3.18 24  0.958   1 0.796 -0.0937 0.882 -0.00956 0.882
-## 2   unknown_2 23  23   17 0.00e+00 3.14 23  0.957   1 0.797  0.0718 0.192  0.00732 0.192
-## 3   unknown_3 22  22   17 3.40e-07 3.09 22  0.955   1 0.824  0.3369 0.001  0.03424 0.001
-## 4   unknown_4 28  28   17 0.00e+00 3.33 28  0.964   1 0.842  0.1791 0.070  0.01825 0.070
-## 5   unknown_5 20  20   17 1.07e-07 3.00 20  0.950   1 0.777  0.0658 0.244  0.00693 0.244
-## 6   unknown_6 17  17   17 0.00e+00 2.83 17  0.941   1 0.793 -0.0844 0.768 -0.00884 0.768
-## 7   unknown_7 17  17   17 0.00e+00 2.83 17  0.941   1 0.810  0.0829 0.220  0.00866 0.220
-## 8   unknown_8 25  25   17 4.73e-07 3.22 25  0.960   1 0.797  0.1176 0.086  0.01194 0.086
-## 9   unknown_9 20  20   17 1.07e-07 3.00 20  0.950   1 0.769  0.2008 0.031  0.02075 0.031
-## 10 unknown_10 25  25   17 4.73e-07 3.22 25  0.960   1 0.806 -0.0764 0.851 -0.00791 0.851
-##    File
-## 1  test
-## 2  test
-## 3  test
-## 4  test
-## 5  test
-## 6  test
-## 7  test
-## 8  test
-## 9  test
-## 10 test
+##           Pop  N MLG eMLG       SE    H  G lambda E.5  Hexp        Ia  p.Ia     rbarD
+## 1   unknown_1 20  20   14 0.00e+00 3.00 20  0.950   1 0.538  0.173768 0.082  1.75e-02
+## 2   unknown_2 18  18   14 0.00e+00 2.89 18  0.944   1 0.527  0.004583 0.463  5.10e-04
+## 3   unknown_3 15  15   14 0.00e+00 2.71 15  0.933   1 0.569  0.335556 0.028  3.75e-02
+## 4   unknown_4 21  21   14 0.00e+00 3.04 21  0.952   1 0.505 -0.027569 0.604 -3.13e-03
+## 5   unknown_5 21  21   14 0.00e+00 3.04 21  0.952   1 0.554  0.084335 0.220  8.45e-03
+## 6   unknown_6 15  15   14 0.00e+00 2.71 15  0.933   1 0.545  0.000159 0.447  1.61e-05
+## 7   unknown_7 19  19   14 3.79e-07 2.94 19  0.947   1 0.535  0.133998 0.150  1.36e-02
+## 8   unknown_8 15  15   14 0.00e+00 2.71 15  0.933   1 0.528 -0.063656 0.668 -6.43e-03
+## 9   unknown_9 16  16   14 0.00e+00 2.77 16  0.938   1 0.619  0.144477 0.178  1.45e-02
+## 10 unknown_10 19  19   14 3.79e-07 2.94 19  0.947   1 0.489  0.021461 0.411  2.39e-03
+## 11 unknown_11 17  17   14 1.60e-07 2.83 17  0.941   1 0.626  0.021510 0.442  2.16e-03
+## 12 unknown_12 22  22   14 3.70e-07 3.09 22  0.955   1 0.600  0.115848 0.177  1.18e-02
+## 13 unknown_13 14  14   14 0.00e+00 2.64 14  0.929   1 0.582 -0.104198 0.774 -1.16e-02
+## 14 unknown_14 18  18   14 0.00e+00 2.89 18  0.944   1 0.529  0.324839 0.025  3.32e-02
+## 15 unknown_15 19  19   14 3.79e-07 2.94 19  0.947   1 0.594  0.235258 0.068  2.36e-02
+## 16 unknown_16 17  17   14 1.60e-07 2.83 17  0.941   1 0.505  0.257340 0.082  2.61e-02
+## 17 unknown_17 23  23   14 0.00e+00 3.14 23  0.957   1 0.548 -0.160553 0.945 -1.61e-02
+## 18 unknown_18 18  18   14 0.00e+00 2.89 18  0.944   1 0.617  0.189081 0.056  1.91e-02
+## 19 unknown_19 17  17   14 1.60e-07 2.83 17  0.941   1 0.531  0.080380 0.227  8.21e-03
+## 20 unknown_20 17  17   14 1.60e-07 2.83 17  0.941   1 0.488 -0.116947 0.778 -1.30e-02
+##     p.rD File
+## 1  0.082 test
+## 2  0.463 test
+## 3  0.028 test
+## 4  0.604 test
+## 5  0.220 test
+## 6  0.447 test
+## 7  0.150 test
+## 8  0.668 test
+## 9  0.178 test
+## 10 0.411 test
+## 11 0.442 test
+## 12 0.177 test
+## 13 0.774 test
+## 14 0.025 test
+## 15 0.068 test
+## 16 0.082 test
+## 17 0.945 test
+## 18 0.056 test
+## 19 0.227 test
+## 20 0.778 test
 ```
 
 We can see how they all are related (or not so) to each other
 
 
 ```r
-aboot(test, ~pop, sample = 1000, dist = "nei.dist")
+aboot(test, ~pop, sample = 1000, dist = "nei.dist", tree = "nj")
 ```
 
 ```
-## Running bootstraps:       100 / 1000Running bootstraps:       200 / 1000Running bootstraps:       300 / 1000Running bootstraps:       400 / 1000Running bootstraps:       500 / 1000Running bootstraps:       600 / 1000Running bootstraps:       700 / 1000Running bootstraps:       800 / 1000Running bootstraps:       900 / 1000Running bootstraps:       1000 / 1000
+## Running bootstraps:       100 / 1000
+```
+
+```
+## Warning in infinite_vals_replacement(D, warning): Infinite values detected.
+```
+
+```
+## Running bootstraps:       200 / 1000
+```
+
+```
+## Warning in infinite_vals_replacement(D, warning): Infinite values detected.
+
+## Warning in infinite_vals_replacement(D, warning): Infinite values detected.
+```
+
+```
+## Running bootstraps:       300 / 1000
+```
+
+```
+## Warning in infinite_vals_replacement(D, warning): Infinite values detected.
+
+## Warning in infinite_vals_replacement(D, warning): Infinite values detected.
+
+## Warning in infinite_vals_replacement(D, warning): Infinite values detected.
+```
+
+```
+## Running bootstraps:       400 / 1000
+```
+
+```
+## Warning in infinite_vals_replacement(D, warning): Infinite values detected.
+```
+
+```
+## Running bootstraps:       500 / 1000
+```
+
+```
+## Warning in infinite_vals_replacement(D, warning): Infinite values detected.
+
+## Warning in infinite_vals_replacement(D, warning): Infinite values detected.
+
+## Warning in infinite_vals_replacement(D, warning): Infinite values detected.
+```
+
+```
+## Running bootstraps:       600 / 1000Running bootstraps:       700 / 1000
+```
+
+```
+## Warning in infinite_vals_replacement(D, warning): Infinite values detected.
+```
+
+```
+## Running bootstraps:       800 / 1000
+```
+
+```
+## Warning in infinite_vals_replacement(D, warning): Infinite values detected.
+```
+
+```
+## Running bootstraps:       900 / 1000
+```
+
+```
+## Warning in infinite_vals_replacement(D, warning): Infinite values detected.
+
+## Warning in infinite_vals_replacement(D, warning): Infinite values detected.
+```
+
+```
+## Running bootstraps:       1000 / 1000
 ## Calculating bootstrap values... done.
 ```
 
@@ -376,14 +528,14 @@ aboot(test, ~pop, sample = 1000, dist = "nei.dist")
 
 ```
 ## 
-## Phylogenetic tree with 10 tips and 9 internal nodes.
+## Phylogenetic tree with 20 tips and 18 internal nodes.
 ## 
 ## Tip labels:
 ## 	unknown_1, unknown_2, unknown_3, unknown_4, unknown_5, unknown_6, ...
 ## Node labels:
-## 	100, 45.8, 20.8, 8.2, 4.8, 35.5, ...
+## 	100, 1.9, 0.1, 4.5, 2.8, 6.6, ...
 ## 
-## Rooted; includes branch lengths.
+## Unrooted; includes branch lengths.
 ```
 
 Now that we've set up the popualtions, we can randomly sample two individuals
@@ -391,19 +543,21 @@ from each and pool them together.
 
 
 ```r
-sample_two <- quote(flatten_dbl(map(popNames(test), ~{ sample(which(pop(test) == .), 2) })))
-subsamples <- replicate(100, test[eval(sample_two), ])
+# Sample one individual per population
+sample_one <- quote(flatten_dbl(map(popNames(test), ~{ sample(which(pop(test) == .), 1) })))
+subsamples <- replicate(100, test[eval(sample_one), ])
 ```
 
 
 ```r
-p <- dplyr::progress_estimated(length(subsamples))
-res <- map(subsamples, ~{
-  p$tick()$print()
-  ia(., sample = 999, valuereturn = TRUE, plot = FALSE, quiet = TRUE)
-})
-p$stop()
+cl <- makeCluster(4)
+registerDoParallel(cl, cores = 4)
+set.seed(2017-11-21)
+res <- foreach(i = seq(subsamples), .combine = c, .packages = c("poppr")) %dopar% 
+  list(ia(subsamples[[i]], sample = 999, valuereturn = TRUE, plot = FALSE, quiet = TRUE))
+stopCluster(cl)
 
+# reshaping everything into a data frame
 resdf <- map(res, 1) %>% 
   map(as.list) %>% 
   bind_rows()
@@ -412,18 +566,18 @@ resdf <- map(res, 1) %>%
 
 ```
 ## # A tibble: 100 x 5
-##             Ia  p.Ia        rbarD  p.rD                   sims
-##          <dbl> <dbl>        <dbl> <dbl>                 <list>
-##  1  0.21039302 0.032  0.021247657 0.032 <data.frame [999 x 2]>
-##  2  0.42522718 0.001  0.042789229 0.001 <data.frame [999 x 2]>
-##  3  0.45001788 0.001  0.045507524 0.001 <data.frame [999 x 2]>
-##  4  0.19283401 0.033  0.019530412 0.033 <data.frame [999 x 2]>
-##  5  0.08062331 0.209  0.008183942 0.209 <data.frame [999 x 2]>
-##  6  0.15492112 0.374  0.015778779 0.374 <data.frame [999 x 2]>
-##  7 -0.01118965 0.529 -0.001126808 0.529 <data.frame [999 x 2]>
-##  8  0.10354491 0.170  0.010551664 0.170 <data.frame [999 x 2]>
-##  9  0.67430751 0.001  0.068084058 0.001 <data.frame [999 x 2]>
-## 10  0.22415784 0.021  0.022824349 0.021 <data.frame [999 x 2]>
+##              Ia  p.Ia         rbarD  p.rD                   sims
+##           <dbl> <dbl>         <dbl> <dbl>                 <list>
+##  1 -0.007831015 0.529 -0.0007960794 0.529 <data.frame [999 x 2]>
+##  2 -0.037082295 0.664 -0.0037582308 0.664 <data.frame [999 x 2]>
+##  3  0.019440628 0.428  0.0019572343 0.428 <data.frame [999 x 2]>
+##  4  0.031756259 0.792  0.0032535803 0.792 <data.frame [999 x 2]>
+##  5 -0.119584838 0.917 -0.0120549541 0.917 <data.frame [999 x 2]>
+##  6 -0.070920957 0.787 -0.0071306607 0.787 <data.frame [999 x 2]>
+##  7 -0.057251536 0.718 -0.0057770677 0.718 <data.frame [999 x 2]>
+##  8  0.040994881 0.722  0.0042047795 0.722 <data.frame [999 x 2]>
+##  9 -0.041524960 0.672 -0.0041811073 0.672 <data.frame [999 x 2]>
+## 10  0.017522959 0.448  0.0017786491 0.448 <data.frame [999 x 2]>
 ## # ... with 90 more rows
 ```
 
@@ -436,14 +590,12 @@ sum(resdf$p.rD <= 0.05)/nrow(resdf)
 ```
 
 ```
-## [1] 0.56
+## [1] 0.03
 ```
 
-That's quite a lot!
+That's not very many.
 
 What do the data look like:
-
-
 
 
 ```r
@@ -461,7 +613,7 @@ resdf %>%
     color = "p-value",
     x = expression(paste(bar(r)[d])),
     title = "The index of association of mixed population samples",
-    subtitle = "100 replicates; 10 populations; 2 individuals from each population",
+    subtitle = "100 replicates; 20 populations; 1 individual from each population",
     caption = expression(paste("(dashed lines: observed ", bar(r)[d], " values)"))
   ))
 ```
@@ -489,7 +641,7 @@ devtools::session_info()
 ##  language (EN)                        
 ##  collate  en_US.UTF-8                 
 ##  tz       America/Chicago             
-##  date     2017-11-21
+##  date     2017-11-22
 ```
 
 ```
@@ -509,7 +661,7 @@ devtools::session_info()
 ##  boot          1.3-20      2017-07-30 CRAN (R 3.4.1)                     
 ##  broom         0.4.2       2017-02-13 CRAN (R 3.4.0)                     
 ##  cellranger    1.1.0       2016-07-27 CRAN (R 3.4.0)                     
-##  cli           1.0.0       2017-11-05 CRAN (R 3.4.2)                     
+##  cli           1.0.0       2017-11-22 Github (r-lib/cli@ab1c3aa)         
 ##  cluster       2.0.6       2017-03-16 CRAN (R 3.4.0)                     
 ##  coda          0.19-1      2016-12-08 CRAN (R 3.4.0)                     
 ##  codetools     0.2-15      2016-10-05 CRAN (R 3.4.0)                     
@@ -520,12 +672,14 @@ devtools::session_info()
 ##  deldir        0.1-14      2017-04-22 CRAN (R 3.4.0)                     
 ##  devtools      1.13.3      2017-08-02 CRAN (R 3.4.1)                     
 ##  digest        0.6.12      2017-01-27 CRAN (R 3.4.0)                     
+##  doParallel  * 1.0.11      2017-09-28 CRAN (R 3.4.1)                     
 ##  dplyr       * 0.7.4       2017-09-28 CRAN (R 3.4.1)                     
 ##  evaluate      0.10.1      2017-06-24 CRAN (R 3.4.1)                     
 ##  expm          0.999-2     2017-03-29 CRAN (R 3.4.0)                     
 ##  ezknitr       0.6         2016-09-16 CRAN (R 3.4.0)                     
 ##  fastmatch     1.1-0       2017-01-28 CRAN (R 3.4.0)                     
 ##  forcats     * 0.2.0       2017-01-23 CRAN (R 3.4.0)                     
+##  foreach     * 1.4.3       2015-10-13 CRAN (R 3.4.0)                     
 ##  foreign       0.8-69      2017-06-21 CRAN (R 3.4.0)                     
 ##  gdata         2.18.0      2017-06-06 CRAN (R 3.4.0)                     
 ##  ggplot2     * 2.2.1       2016-12-30 CRAN (R 3.4.0)                     
@@ -545,8 +699,10 @@ devtools::session_info()
 ##  httpuv        1.3.5       2017-07-04 CRAN (R 3.4.1)                     
 ##  httr          1.3.1       2017-08-20 cran (@1.3.1)                      
 ##  igraph        1.1.2       2017-07-21 cran (@1.1.2)                      
+##  iterators   * 1.0.8       2015-10-13 CRAN (R 3.4.0)                     
 ##  jsonlite      1.5         2017-06-01 CRAN (R 3.4.0)                     
 ##  knitr         1.17        2017-08-10 cran (@1.17)                       
+##  kop         * 0.0.0.9000  2017-11-22 local (@0.0.0.9)                   
 ##  labeling      0.3         2014-08-23 CRAN (R 3.4.0)                     
 ##  lattice       0.20-35     2017-03-25 CRAN (R 3.4.0)                     
 ##  lazyeval      0.2.1       2017-10-29 CRAN (R 3.4.2)                     
@@ -563,7 +719,7 @@ devtools::session_info()
 ##  modelr        0.1.1       2017-07-24 CRAN (R 3.4.1)                     
 ##  munsell       0.4.3       2016-02-13 CRAN (R 3.4.0)                     
 ##  nlme          3.1-131     2017-02-06 CRAN (R 3.4.0)                     
-##  parallel      3.4.2       2017-10-04 local                              
+##  parallel    * 3.4.2       2017-10-04 local                              
 ##  pegas         0.10        2017-05-03 CRAN (R 3.4.0)                     
 ##  permute       0.9-4       2016-09-09 CRAN (R 3.4.0)                     
 ##  phangorn      2.3.1       2017-11-01 CRAN (R 3.4.2)                     
@@ -596,7 +752,7 @@ devtools::session_info()
 ##  stringr     * 1.2.0       2017-02-18 CRAN (R 3.4.0)                     
 ##  tibble      * 1.3.4       2017-08-22 cran (@1.3.4)                      
 ##  tidyr       * 0.7.2       2017-10-16 CRAN (R 3.4.2)                     
-##  tidyverse   * 1.2.0       2017-11-08 local                              
+##  tidyverse   * 1.2.1       2017-11-14 cran (@1.2.1)                      
 ##  tools         3.4.2       2017-10-04 local                              
 ##  utils       * 3.4.2       2017-10-04 local                              
 ##  vegan         2.4-4       2017-08-24 cran (@2.4-4)                      
