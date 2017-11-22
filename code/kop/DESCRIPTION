@@ -1,0 +1,18 @@
+Package: kop
+Title: Simulation of Populations
+Version: 0.0.0.9000
+Imports: poppr, purrr, dplyr, tibble
+Authors@R: c(person(c("Zhian", "N."), "Kamvar", role = c("cre", "aut"),
+  email = "zkamvar@gmail.com", comment = c(ORCID = "0000-0003-1458-7108")),
+  person(c("Sydney", "E."), "Everhart", role = c("ctb"),
+  email = "everhart@unl.edu", comment = c(ORCID = "0000-0002-5773-1280")))
+Maintainer: Zhian N. Kamvar <zkamvar@gmail.com>
+Description: The package 'kop' stands for "King of Pop" (RIP MJ) because it is
+  designed to quickly generate populations without very much effort much like
+  Michael Jackson was able to brilliantly generate memorable and quailty pop
+  music. 
+Depends: R (>= 3.4.2)
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 6.0.1

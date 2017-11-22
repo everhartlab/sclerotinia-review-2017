@@ -25,10 +25,17 @@
 #' @examples
 #' pop_generator() # panmictic population
 #' pop_genearator(clone_gen = 5, mu = 0.5)
-pop_generator <- function(n = 100, 
+#' 
+#' @importFrom poppr as.genclone
+#' @importFrom adegenet genind
+#' @importFrom purrr map_chr map
+#' @importFrom dplyr progress_estimated
+pop_generator <- function(n = 1000, 
+                          samp = 100,
                           ploidy = 1, 
                           freq = NULL,
                           nall = sample(4:12, 11, replace = TRUE),
+                          mate_gen = 100,
                           clone_gen = 0,
                           mu = 0.05,
                           verbose = TRUE,
@@ -52,34 +59,84 @@ pop_generator <- function(n = 100,
   }
   restab <- do.call(cbind, reslist)
   mutation_events <- 0
+  locfac <- factor(locnames, unique(locnames))
+  if (verbose) {
+    message("Beginning mating\n")
+    p <- dplyr::progress_estimated(mate_gen)
+  } 
+  for (i in seq_len(mate_gen)) {
+    if (verbose) p$tick()$print()
+    if (mu > runif(1)) {
+      restab <- mutator(restab, locnames, ploidy)
+      mutation_events <- mutation_events + 1
+    }
+    restab <- t(vapply(seq_len(n), 
+                       FUN = function(i){ mater(restab, locfac, ploidy) }, 
+                       FUN.VALUE = restab[1, ]))
+  }
+  if (verbose) {
+    message("\nI recorded ", mutation_events, " mutation events\n")
+    p$stop()
+  }
+  
   if (clone_gen > 0) {
-    if (verbose) p <- dplyr::progress_estimated(clone_gen)
+    if (verbose) {
+      message("starting clonal reproduction...\n")
+      p <- dplyr::progress_estimated(clone_gen)
+    }
     for (i in seq_len(clone_gen)) {
       if (verbose) p$tick()$print()
       if (mu > runif(1)) {
-        ind <- sample(n, 1)
-        loc <- grepl(sample(locnames, 1), colnames(restab))
-        prob <- colMeans(restab[, loc], na.rm = TRUE)
-        restab[ind, loc] <- rmultinom(1, ploidy, prob)
+        restab <- mutator(restab, locnames, ploidy)
         mutation_events <- mutation_events + 1
       }
       restab <- restab[sample(n, replace = TRUE), ]
     }
     if (verbose) {
-      cat("I recorded", mutation_events, "mutation events\n")
+      message("\nI recorded ", mutation_events, " mutation events\n")
       p$stop()
     }
   }
-  res <- genind(restab, ploidy = ploidy, type = "codom")
+  res <- genind(restab[sample(n, samp), ], ploidy = ploidy, type = "codom")
   if (genclone) {
     res <- as.genclone(res)
   }
   res
 }
 
-message("pop_generator is loaded.\n\nUSAGE:\n")
-x <- capture.output(args(pop_generator))
-x <- gsub("NULL", "", x)
-x <- gsub("function ", "pop_generator", x)
-x <- gsub(" ,", " NULL,", x)
-message(paste(trimws(x), collapse = " "))
+#' Create a single recombinant offspring from two randomly sampled parents
+#'
+#' @param mat a matrix of individuals x alleles
+#' @param loci a factor deliniating the loci in each column
+#' @param ploidy the ploidy of the sample
+#'
+#' @return a vector of alleles
+#' @export
+#'
+#' @examples
+#' mat <- t(rbind(rmultinom(100, 2, runif(10)),
+#'              rmultinom(100, 2, runif(10)))) # two loci with 20 alleles
+#' loc <- factor(rep(LETTERS[1:2], each = 10))
+#' t(vapply(seq_len(nrow(mat)), function(i) mater(mat, loc, 2), mat[1, ]))
+mater <- function(mat, loci, ploidy = 1){
+  x        <- sample(nrow(mat), 2)
+  parentab <- colSums(mat[x, ])
+  res      <- rep(0L, ncol(mat))
+  for (i in seq_len(ploidy)) {
+    pindex   <- which(parentab > 0)
+    pl       <- split(parentab[pindex], loci[pindex])
+    new_nall <- lengths(pl)
+    samps    <- vapply(new_nall, sample, integer(1), 1) + cumsum(new_nall) - new_nall
+    res[pindex[samps]] <- 1L
+    parentab[pindex[samps]] <- parentab[pindex[samps]] - 1L 
+  }
+  res
+}
+
+mutator <- function(mat, locnames, ploidy){
+  ind <- sample(nrow(mat), 1)
+  loc <- grepl(sample(locnames, 1), colnames(mat))
+  prob <- colMeans(mat[, loc], na.rm = TRUE)
+  mat[ind, loc] <- rmultinom(1, ploidy, 1 - prob)
+  mat
+}
