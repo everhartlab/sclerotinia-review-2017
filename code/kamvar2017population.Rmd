@@ -249,13 +249,12 @@ What do the data look like:
 
 ```{r fig.width = 10, fig.height = 5, dependson = "resample_populations"}
 ccia <- poppr(test, quiet = TRUE, total = FALSE)
-resdf %>% 
+the_plot <- resdf %>% 
   ggplot(aes(x = rbarD, fill = p.rD >= 0.05)) + 
   geom_histogram(binwidth = 0.01, position = "stack", color = "black") +
   geom_rug(aes(color = p.rD)) +
   viridis::scale_color_viridis() +
   scale_fill_manual(values = c("grey30", "grey80")) +
-  geom_vline(xintercept = ccia$rbarD, lty = 3) +
   theme_bw(base_size = 16, base_family = "Helvetica") +
   labs(list(
     fill = expression(paste("p >= 0.05")),
@@ -265,6 +264,19 @@ resdf %>%
     subtitle = "100 replicates; 20 populations; 1 individual from each population",
     caption = expression(paste("(dashed lines: observed ", bar(r)[d], " values)"))
   ))
+the_plot + geom_vline(xintercept = ccia$rbarD, lty = 3)
+```
+
+
+What happens when we randomly sample 20 individuals from each population?
+
+```{r randsamp, fig.width = 10, fig.height = 5, cache = TRUE, dependson = "resample_populations"}
+resampled_rbarD <- seppop(test) %>%
+  map(resample.ia, n = 20) %>%
+  map_dbl(~{ mean (.$rbarD)})
+the_plot + 
+  geom_vline(xintercept = resampled_rbarD, lty = 3) +
+  labs(caption = expression(paste("(dashed lines: resampled ", bar(r)[d], " values)")))
 ```
 
 
