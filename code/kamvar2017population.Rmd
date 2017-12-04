@@ -196,10 +196,14 @@ test <- test %>%
   repool() %>%
   as.genclone()
 strata(test) <- data.frame(pop = pop(test))
+```
+
+```{r poptree, cache = TRUE}
 test
 nAll(test)
-plot(ape::nj(dist(test)), lab4ut = "axial", type = "unrooted", tip.col = adegenet::funky(nPop(test))[pop(test)])
+plot(ape::nj(diss.dist(test, percent = TRUE)), lab4ut = "axial", type = "unrooted", tip.col = adegenet::funky(nPop(test))[pop(test)])
 ```
+
 
 We can see from this that the clonal reproduction reduced the number of unique
 individuals quite a bit. If we test the index of association for these
@@ -294,6 +298,14 @@ the_plot +
 ```
 
 
+# Attempting to make pretty plots
+
+
+Because the ulitmate goal here is to make graphics that may be understandable,
+I'm goint to attempt to create a ridgeline density plot of $\bar{r}_d$ values
+and combine that with a tree of the 20 random samples overlayed on random
+samples from all populations.
+
 ```{r fig.width = 3.5, fig.height = 5}
 ridgelines <- resdf %>% 
   select(Ia, rbarD) %>% 
@@ -333,6 +345,13 @@ p_ridge
 ggsave(p_ridge, filename = here::here("results/figures/p-ridge.pdf"))
 ```
 
+
+Here we need to create a tree that is digestable, which means creating one that
+we can easily label. I am first taking one of the data sets that had random
+subsamples and am resampling 19 individuals from each of the 20 populations and
+creating a tree from the resulting 400 individuals. From this tree, I will
+highlight the edges that are found in the subsample and compare those to the
+trees created from within-population subsample.
 
 ```{r treecomparison, fig.width = 6, fig.height = 3.5}
 s1 <- subsamples[[2]]
@@ -387,7 +406,7 @@ treeplot()
 dev.off()
 ```
 
-
+I can use plot_grid from cowplot to combine the main tree and the ridgeline density plot.
 
 ```{r fig.width = 6, fig.height = 3.5}
 plot_grid(maintree, p_ridge + theme(legend.position = "none"), scale = c(0.8, 1), labels = "AUTO")

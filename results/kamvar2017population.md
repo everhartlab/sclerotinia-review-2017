@@ -161,7 +161,7 @@ dat11 %>%
 ## 1   4 14   9 6.93 0.849 1.97  5.44  0.816 0.724 0.431 2.96 0.001 0.302 0.001    .
 ## 2  45 16   7 5.25 0.881 1.56  3.37  0.703 0.630 0.192 2.52 0.001 0.286 0.001    .
 ## 3   5 73  37 7.72 1.266 3.05 10.68  0.906 0.481 0.408 2.74 0.001 0.292 0.001    .
-## 4   2 10   9 9.00 0.000 2.16  8.33  0.880 0.952 0.590 1.43 0.001 0.144 0.001    .
+## 4   2 10   9 9.00 0.000 2.16  8.33  0.880 0.952 0.590 1.43 0.002 0.144 0.002    .
 ## 5  44 36  19 7.37 1.201 2.57  8.53  0.883 0.625 0.338 2.93 0.001 0.330 0.001    .
 ## 6   1 15  10 7.47 0.876 2.15  7.26  0.862 0.822 0.451 1.94 0.001 0.243 0.001    .
 ## 7  49 11   6 5.73 0.445 1.64  4.48  0.777 0.836 0.274 3.87 0.001 0.487 0.001    .
@@ -186,7 +186,7 @@ dat11 %>%
 ```
 ##   Pop  N MLG eMLG    SE    H     G lambda   E.5  Hexp   Ia  p.Ia rbarD  p.rD File
 ## 1   4 14   9 6.93 0.849 1.97  5.44  0.816 0.724 0.431 2.96 0.001 0.302 0.001    .
-## 2  45 12   7 6.15 0.657 1.70  4.24  0.764 0.724 0.240 2.34 0.002 0.264 0.002    .
+## 2  45 12   7 6.15 0.657 1.70  4.24  0.764 0.724 0.240 2.34 0.001 0.264 0.001    .
 ## 3   5 60  37 8.69 1.017 3.32 19.57  0.949 0.696 0.451 2.27 0.001 0.239 0.001    .
 ## 4   2  9   9 9.00 0.000 2.20  9.00  0.889 1.000 0.604 1.41 0.001 0.142 0.001    .
 ## 5  44 27  19 8.26 1.065 2.72 11.22  0.911 0.717 0.404 2.45 0.001 0.274 0.001    .
@@ -212,11 +212,11 @@ dat11 %>%
 ```
 ##   Pop  N MLG eMLG       SE    H  G lambda E.5  Hexp   Ia  p.Ia  rbarD  p.rD File
 ## 1   4  9   9    9 0.00e+00 2.20  9  0.889   1 0.551 1.26 0.002 0.1279 0.002    .
-## 2  45  7   7    7 0.00e+00 1.95  7  0.857   1 0.372 1.51 0.009 0.1680 0.009    .
+## 2  45  7   7    7 0.00e+00 1.95  7  0.857   1 0.372 1.51 0.006 0.1680 0.006    .
 ## 3   5 37  37   10 0.00e+00 3.61 37  0.973   1 0.509 1.61 0.001 0.1663 0.001    .
 ## 4   2  9   9    9 0.00e+00 2.20  9  0.889   1 0.604 1.41 0.001 0.1416 0.001    .
 ## 5  44 19  19   10 2.51e-07 2.94 19  0.947   1 0.489 1.28 0.001 0.1425 0.001    .
-## 6   1 10  10   10 0.00e+00 2.30 10  0.900   1 0.489 0.78 0.003 0.0977 0.003    .
+## 6   1 10  10   10 0.00e+00 2.30 10  0.900   1 0.489 0.78 0.002 0.0977 0.002    .
 ## 7  49  6   6    6 0.00e+00 1.79  6  0.833   1 0.315 3.12 0.003 0.3909 0.003    .
 ## 8   9  8   8    8 0.00e+00 2.08  8  0.875   1 0.575 3.04 0.001 0.3431 0.001    .
 ```
@@ -317,6 +317,10 @@ test <- test %>%
   repool() %>%
   as.genclone()
 strata(test) <- data.frame(pop = pop(test))
+```
+
+
+```r
 test
 ```
 
@@ -326,7 +330,7 @@ test
 ## -------------------------
 ## Genotype information:
 ## 
-##     361 original multilocus genotypes 
+##     341 original multilocus genotypes 
 ##    2000 haploid individuals
 ##      11 codominant loci
 ## 
@@ -343,16 +347,17 @@ nAll(test)
 
 ```
 ##  locus 1  locus 2  locus 3  locus 4  locus 5  locus 6  locus 7  locus 8  locus 9 locus 10 
-##       12       12       12       11       11       12       11       11       11       11 
+##       12       11       12       10       11       11       10       10       10       12 
 ## locus 11 
-##       12
+##       10
 ```
 
 ```r
-plot(ape::nj(dist(test)), lab4ut = "axial", type = "unrooted", tip.col = adegenet::funky(nPop(test))[pop(test)])
+plot(ape::nj(diss.dist(test, percent = TRUE)), lab4ut = "axial", type = "unrooted", tip.col = adegenet::funky(nPop(test))[pop(test)])
 ```
 
-![plot of chunk create-population](./figures/kamvar2017population//create-population-1.png)
+![plot of chunk poptree](./figures/kamvar2017population//poptree-1.png)
+
 
 We can see from this that the clonal reproduction reduced the number of unique
 individuals quite a bit. If we test the index of association for these
@@ -367,26 +372,26 @@ poppr(test, total = FALSE, sample = 999)
 
 ```
 ##           Pop   N MLG eMLG SE    H     G lambda   E.5  Hexp    Ia  p.Ia  rbarD  p.rD File
-## 1   unknown_1 100  20   20  0 2.67 11.85  0.916 0.811 0.486 1.211 0.001 0.1242 0.001 test
-## 2   unknown_2 100  18   18  0 2.71 13.51  0.926 0.893 0.472 0.569 0.001 0.0633 0.001 test
-## 3   unknown_3 100  15   15  0 2.11  5.95  0.832 0.682 0.437 1.897 0.001 0.2110 0.001 test
-## 4   unknown_4 100  21   21  0 2.74 12.82  0.922 0.815 0.452 0.656 0.001 0.0760 0.001 test
-## 5   unknown_5 100  21   21  0 2.64 10.46  0.904 0.730 0.529 1.083 0.001 0.1084 0.001 test
-## 6   unknown_6 100  15   15  0 2.32  7.94  0.874 0.752 0.502 1.524 0.001 0.1559 0.001 test
-## 7   unknown_7 100  19   19  0 2.70 12.17  0.918 0.804 0.468 0.958 0.001 0.0970 0.001 test
-## 8   unknown_8 100  15   15  0 2.36  8.36  0.880 0.768 0.458 1.021 0.001 0.1045 0.001 test
-## 9   unknown_9 100  16   16  0 2.50 10.18  0.902 0.822 0.581 1.735 0.001 0.1741 0.001 test
-## 10 unknown_10 100  19   19  0 2.63 11.01  0.909 0.781 0.420 0.602 0.001 0.0670 0.001 test
-## 11 unknown_11 100  17   17  0 2.54 10.66  0.906 0.829 0.596 1.298 0.001 0.1300 0.001 test
-## 12 unknown_12 100  22   22  0 2.79 13.37  0.925 0.813 0.588 1.070 0.001 0.1075 0.001 test
-## 13 unknown_13 100  14   14  0 2.37  8.87  0.887 0.807 0.534 1.240 0.001 0.1379 0.001 test
-## 14 unknown_14 100  18   18  0 2.62 11.11  0.910 0.797 0.466 1.429 0.001 0.1563 0.001 test
-## 15 unknown_15 100  19   19  0 2.71 13.05  0.923 0.859 0.553 1.038 0.001 0.1038 0.001 test
-## 16 unknown_16 100  17   17  0 2.58 11.44  0.913 0.857 0.461 1.223 0.001 0.1232 0.001 test
-## 17 unknown_17 100  23   23  0 2.85 13.77  0.927 0.786 0.517 0.708 0.001 0.0715 0.001 test
-## 18 unknown_18 100  18   18  0 2.63 11.60  0.914 0.821 0.570 1.356 0.001 0.1361 0.001 test
-## 19 unknown_19 100  17   17  0 2.55 10.96  0.909 0.842 0.495 1.103 0.001 0.1172 0.001 test
-## 20 unknown_20 100  17   17  0 2.60 11.01  0.909 0.799 0.475 0.883 0.001 0.0990 0.001 test
+## 1   unknown_1 100  19   19  0 2.56 10.37  0.904 0.787 0.507 1.208 0.001 0.1345 0.001 test
+## 2   unknown_2 100  15   15  0 2.40  9.31  0.893 0.829 0.541 1.276 0.001 0.1419 0.001 test
+## 3   unknown_3 100  16   16  0 2.50 10.31  0.903 0.830 0.511 1.342 0.001 0.1365 0.001 test
+## 4   unknown_4 100  17   17  0 2.63 12.47  0.920 0.887 0.487 1.078 0.001 0.1207 0.001 test
+## 5   unknown_5 100  20   20  0 2.71 12.53  0.920 0.823 0.469 0.453 0.001 0.0455 0.001 test
+## 6   unknown_6 100  15   15  0 2.48 10.42  0.904 0.859 0.467 1.003 0.001 0.1116 0.001 test
+## 7   unknown_7 100  16   16  0 2.33  7.40  0.865 0.688 0.400 1.068 0.001 0.1232 0.001 test
+## 8   unknown_8 100  16   16  0 2.54 10.99  0.909 0.853 0.512 1.192 0.001 0.1235 0.001 test
+## 9   unknown_9 100  14   14  0 2.09  5.68  0.824 0.661 0.426 1.415 0.001 0.1425 0.001 test
+## 10 unknown_10 100  16   16  0 2.44 10.10  0.901 0.865 0.525 1.452 0.001 0.1615 0.001 test
+## 11 unknown_11 100  18   18  0 2.42  7.69  0.870 0.655 0.435 1.324 0.001 0.1332 0.001 test
+## 12 unknown_12 100  17   17  0 2.48  9.11  0.890 0.745 0.484 1.079 0.001 0.1201 0.001 test
+## 13 unknown_13 100  17   17  0 2.55 10.64  0.906 0.813 0.600 1.717 0.001 0.1722 0.001 test
+## 14 unknown_14 100  16   16  0 2.46 10.14  0.901 0.850 0.429 0.767 0.001 0.0773 0.001 test
+## 15 unknown_15 100  23   23  0 2.85 14.29  0.930 0.815 0.560 0.901 0.001 0.0906 0.001 test
+## 16 unknown_16 100  17   17  0 2.42  8.18  0.878 0.699 0.482 1.097 0.001 0.1102 0.001 test
+## 17 unknown_17 100  18   18  0 2.49  8.77  0.886 0.705 0.459 1.293 0.001 0.1298 0.001 test
+## 18 unknown_18 100  18   18  0 2.55 10.20  0.902 0.783 0.597 1.691 0.001 0.1891 0.001 test
+## 19 unknown_19 100  18   18  0 2.58 10.82  0.908 0.805 0.442 0.907 0.001 0.0967 0.001 test
+## 20 unknown_20 100  15   15  0 2.37  8.14  0.877 0.739 0.416 1.265 0.001 0.1481 0.001 test
 ```
 
 ```r
@@ -396,48 +401,48 @@ poppr(test, clonecorrect = TRUE, total = FALSE, strata = ~pop, sample = 999)
 ![plot of chunk ia-sims](./figures/kamvar2017population//ia-sims-2.png)
 
 ```
-##           Pop  N MLG eMLG       SE    H  G lambda E.5  Hexp        Ia  p.Ia     rbarD
-## 1   unknown_1 20  20   14 0.00e+00 3.00 20  0.950   1 0.538  0.173768 0.082  1.75e-02
-## 2   unknown_2 18  18   14 0.00e+00 2.89 18  0.944   1 0.527  0.004583 0.463  5.10e-04
-## 3   unknown_3 15  15   14 0.00e+00 2.71 15  0.933   1 0.569  0.335556 0.028  3.75e-02
-## 4   unknown_4 21  21   14 0.00e+00 3.04 21  0.952   1 0.505 -0.027569 0.604 -3.13e-03
-## 5   unknown_5 21  21   14 0.00e+00 3.04 21  0.952   1 0.554  0.084335 0.220  8.45e-03
-## 6   unknown_6 15  15   14 0.00e+00 2.71 15  0.933   1 0.545  0.000159 0.447  1.61e-05
-## 7   unknown_7 19  19   14 3.79e-07 2.94 19  0.947   1 0.535  0.133998 0.150  1.36e-02
-## 8   unknown_8 15  15   14 0.00e+00 2.71 15  0.933   1 0.528 -0.063656 0.668 -6.43e-03
-## 9   unknown_9 16  16   14 0.00e+00 2.77 16  0.938   1 0.619  0.144477 0.178  1.45e-02
-## 10 unknown_10 19  19   14 3.79e-07 2.94 19  0.947   1 0.489  0.021461 0.411  2.39e-03
-## 11 unknown_11 17  17   14 1.60e-07 2.83 17  0.941   1 0.626  0.021510 0.442  2.16e-03
-## 12 unknown_12 22  22   14 3.70e-07 3.09 22  0.955   1 0.600  0.115848 0.177  1.18e-02
-## 13 unknown_13 14  14   14 0.00e+00 2.64 14  0.929   1 0.582 -0.104198 0.774 -1.16e-02
-## 14 unknown_14 18  18   14 0.00e+00 2.89 18  0.944   1 0.529  0.324839 0.025  3.32e-02
-## 15 unknown_15 19  19   14 3.79e-07 2.94 19  0.947   1 0.594  0.235258 0.068  2.36e-02
-## 16 unknown_16 17  17   14 1.60e-07 2.83 17  0.941   1 0.505  0.257340 0.082  2.61e-02
-## 17 unknown_17 23  23   14 0.00e+00 3.14 23  0.957   1 0.548 -0.160553 0.945 -1.61e-02
-## 18 unknown_18 18  18   14 0.00e+00 2.89 18  0.944   1 0.617  0.189081 0.056  1.91e-02
-## 19 unknown_19 17  17   14 1.60e-07 2.83 17  0.941   1 0.531  0.080380 0.227  8.21e-03
-## 20 unknown_20 17  17   14 1.60e-07 2.83 17  0.941   1 0.488 -0.116947 0.778 -1.30e-02
-##     p.rD File
-## 1  0.082 test
-## 2  0.463 test
-## 3  0.028 test
-## 4  0.604 test
-## 5  0.220 test
-## 6  0.447 test
-## 7  0.150 test
-## 8  0.668 test
-## 9  0.178 test
-## 10 0.411 test
-## 11 0.442 test
-## 12 0.177 test
-## 13 0.774 test
-## 14 0.025 test
-## 15 0.068 test
-## 16 0.082 test
-## 17 0.945 test
-## 18 0.056 test
-## 19 0.227 test
-## 20 0.778 test
+##           Pop  N MLG eMLG       SE    H  G lambda E.5  Hexp       Ia  p.Ia    rbarD  p.rD
+## 1   unknown_1 19  19   14 3.79e-07 2.94 19  0.947   1 0.537 -0.01019 0.537 -0.00114 0.537
+## 2   unknown_2 15  15   14 0.00e+00 2.71 15  0.933   1 0.587 -0.08677 0.761 -0.00967 0.761
+## 3   unknown_3 16  16   14 0.00e+00 2.77 16  0.938   1 0.590  0.14437 0.278  0.01452 0.278
+## 4   unknown_4 17  17   14 1.60e-07 2.83 17  0.941   1 0.524  0.30389 0.033  0.03390 0.033
+## 5   unknown_5 20  20   14 0.00e+00 3.00 20  0.950   1 0.512 -0.24573 0.994 -0.02461 0.994
+## 6   unknown_6 15  15   14 0.00e+00 2.71 15  0.933   1 0.532  0.13975 0.189  0.01557 0.189
+## 7   unknown_7 16  16   14 0.00e+00 2.77 16  0.938   1 0.433 -0.04173 0.578 -0.00470 0.578
+## 8   unknown_8 16  16   14 0.00e+00 2.77 16  0.938   1 0.580  0.06271 0.296  0.00635 0.296
+## 9   unknown_9 14  14   14 0.00e+00 2.64 14  0.929   1 0.517 -0.00459 0.582 -0.00046 0.582
+## 10 unknown_10 16  16   14 0.00e+00 2.77 16  0.938   1 0.575  0.19450 0.086  0.02166 0.086
+## 11 unknown_11 18  18   14 0.00e+00 2.89 18  0.944   1 0.465  0.29236 0.046  0.02933 0.046
+## 12 unknown_12 17  17   14 1.60e-07 2.83 17  0.941   1 0.541 -0.11771 0.876 -0.01315 0.876
+## 13 unknown_13 17  17   14 1.60e-07 2.83 17  0.941   1 0.632  0.45957 0.002  0.04632 0.002
+## 14 unknown_14 16  16   14 0.00e+00 2.77 16  0.938   1 0.485  0.34701 0.032  0.03509 0.032
+## 15 unknown_15 23  23   14 0.00e+00 3.14 23  0.957   1 0.587  0.05140 0.360  0.00516 0.360
+## 16 unknown_16 17  17   14 1.60e-07 2.83 17  0.941   1 0.581 -0.17684 0.928 -0.01774 0.928
+## 17 unknown_17 18  18   14 0.00e+00 2.89 18  0.944   1 0.572  0.07258 0.293  0.00728 0.293
+## 18 unknown_18 18  18   14 0.00e+00 2.89 18  0.944   1 0.633  0.11256 0.176  0.01267 0.176
+## 19 unknown_19 18  18   14 0.00e+00 2.89 18  0.944   1 0.527 -0.07293 0.698 -0.00740 0.698
+## 20 unknown_20 15  15   14 0.00e+00 2.71 15  0.933   1 0.483  0.25481 0.068  0.02861 0.068
+##    File
+## 1  test
+## 2  test
+## 3  test
+## 4  test
+## 5  test
+## 6  test
+## 7  test
+## 8  test
+## 9  test
+## 10 test
+## 11 test
+## 12 test
+## 13 test
+## 14 test
+## 15 test
+## 16 test
+## 17 test
+## 18 test
+## 19 test
+## 20 test
 ```
 
 We can see how they all are related (or not so) to each other
@@ -448,10 +453,36 @@ aboot(test, ~pop, sample = 1000, dist = "nei.dist", tree = "nj")
 ```
 
 ```
+## Warning in infinite_vals_replacement(D, warning): Infinite values detected.
+
+## Warning in infinite_vals_replacement(D, warning): Infinite values detected.
+
+## Warning in infinite_vals_replacement(D, warning): Infinite values detected.
+
+## Warning in infinite_vals_replacement(D, warning): Infinite values detected.
+
+## Warning in infinite_vals_replacement(D, warning): Infinite values detected.
+
+## Warning in infinite_vals_replacement(D, warning): Infinite values detected.
+
+## Warning in infinite_vals_replacement(D, warning): Infinite values detected.
+
+## Warning in infinite_vals_replacement(D, warning): Infinite values detected.
+```
+
+```
 ## Running bootstraps:       100 / 1000
 ```
 
 ```
+## Warning in infinite_vals_replacement(D, warning): Infinite values detected.
+
+## Warning in infinite_vals_replacement(D, warning): Infinite values detected.
+
+## Warning in infinite_vals_replacement(D, warning): Infinite values detected.
+
+## Warning in infinite_vals_replacement(D, warning): Infinite values detected.
+
 ## Warning in infinite_vals_replacement(D, warning): Infinite values detected.
 ```
 
@@ -460,6 +491,18 @@ aboot(test, ~pop, sample = 1000, dist = "nei.dist", tree = "nj")
 ```
 
 ```
+## Warning in infinite_vals_replacement(D, warning): Infinite values detected.
+
+## Warning in infinite_vals_replacement(D, warning): Infinite values detected.
+
+## Warning in infinite_vals_replacement(D, warning): Infinite values detected.
+
+## Warning in infinite_vals_replacement(D, warning): Infinite values detected.
+
+## Warning in infinite_vals_replacement(D, warning): Infinite values detected.
+
+## Warning in infinite_vals_replacement(D, warning): Infinite values detected.
+
 ## Warning in infinite_vals_replacement(D, warning): Infinite values detected.
 
 ## Warning in infinite_vals_replacement(D, warning): Infinite values detected.
@@ -473,8 +516,6 @@ aboot(test, ~pop, sample = 1000, dist = "nei.dist", tree = "nj")
 ## Warning in infinite_vals_replacement(D, warning): Infinite values detected.
 
 ## Warning in infinite_vals_replacement(D, warning): Infinite values detected.
-
-## Warning in infinite_vals_replacement(D, warning): Infinite values detected.
 ```
 
 ```
@@ -482,6 +523,18 @@ aboot(test, ~pop, sample = 1000, dist = "nei.dist", tree = "nj")
 ```
 
 ```
+## Warning in infinite_vals_replacement(D, warning): Infinite values detected.
+
+## Warning in infinite_vals_replacement(D, warning): Infinite values detected.
+
+## Warning in infinite_vals_replacement(D, warning): Infinite values detected.
+
+## Warning in infinite_vals_replacement(D, warning): Infinite values detected.
+
+## Warning in infinite_vals_replacement(D, warning): Infinite values detected.
+
+## Warning in infinite_vals_replacement(D, warning): Infinite values detected.
+
 ## Warning in infinite_vals_replacement(D, warning): Infinite values detected.
 ```
 
@@ -495,13 +548,45 @@ aboot(test, ~pop, sample = 1000, dist = "nei.dist", tree = "nj")
 ## Warning in infinite_vals_replacement(D, warning): Infinite values detected.
 
 ## Warning in infinite_vals_replacement(D, warning): Infinite values detected.
+
+## Warning in infinite_vals_replacement(D, warning): Infinite values detected.
+
+## Warning in infinite_vals_replacement(D, warning): Infinite values detected.
+
+## Warning in infinite_vals_replacement(D, warning): Infinite values detected.
 ```
 
 ```
-## Running bootstraps:       600 / 1000Running bootstraps:       700 / 1000
+## Running bootstraps:       600 / 1000
 ```
 
 ```
+## Warning in infinite_vals_replacement(D, warning): Infinite values detected.
+
+## Warning in infinite_vals_replacement(D, warning): Infinite values detected.
+
+## Warning in infinite_vals_replacement(D, warning): Infinite values detected.
+
+## Warning in infinite_vals_replacement(D, warning): Infinite values detected.
+
+## Warning in infinite_vals_replacement(D, warning): Infinite values detected.
+
+## Warning in infinite_vals_replacement(D, warning): Infinite values detected.
+
+## Warning in infinite_vals_replacement(D, warning): Infinite values detected.
+```
+
+```
+## Running bootstraps:       700 / 1000
+```
+
+```
+## Warning in infinite_vals_replacement(D, warning): Infinite values detected.
+
+## Warning in infinite_vals_replacement(D, warning): Infinite values detected.
+
+## Warning in infinite_vals_replacement(D, warning): Infinite values detected.
+
 ## Warning in infinite_vals_replacement(D, warning): Infinite values detected.
 ```
 
@@ -511,6 +596,12 @@ aboot(test, ~pop, sample = 1000, dist = "nei.dist", tree = "nj")
 
 ```
 ## Warning in infinite_vals_replacement(D, warning): Infinite values detected.
+
+## Warning in infinite_vals_replacement(D, warning): Infinite values detected.
+
+## Warning in infinite_vals_replacement(D, warning): Infinite values detected.
+
+## Warning in infinite_vals_replacement(D, warning): Infinite values detected.
 ```
 
 ```
@@ -518,6 +609,14 @@ aboot(test, ~pop, sample = 1000, dist = "nei.dist", tree = "nj")
 ```
 
 ```
+## Warning in infinite_vals_replacement(D, warning): Infinite values detected.
+
+## Warning in infinite_vals_replacement(D, warning): Infinite values detected.
+
+## Warning in infinite_vals_replacement(D, warning): Infinite values detected.
+
+## Warning in infinite_vals_replacement(D, warning): Infinite values detected.
+
 ## Warning in infinite_vals_replacement(D, warning): Infinite values detected.
 
 ## Warning in infinite_vals_replacement(D, warning): Infinite values detected.
@@ -537,7 +636,7 @@ aboot(test, ~pop, sample = 1000, dist = "nei.dist", tree = "nj")
 ## Tip labels:
 ## 	unknown_1, unknown_2, unknown_3, unknown_4, unknown_5, unknown_6, ...
 ## Node labels:
-## 	100, 1.9, 0.1, 4.5, 2.8, 6.6, ...
+## 	100, 0.2, 3.3, 7.1, 8.2, 3.1, ...
 ## 
 ## Unrooted; includes branch lengths.
 ```
@@ -572,16 +671,16 @@ resdf <- map(res, 1) %>%
 ## # A tibble: 100 x 5
 ##              Ia  p.Ia         rbarD  p.rD                   sims
 ##           <dbl> <dbl>         <dbl> <dbl>                 <list>
-##  1 -0.007831015 0.529 -0.0007960794 0.529 <data.frame [999 x 2]>
-##  2 -0.037082295 0.664 -0.0037582308 0.664 <data.frame [999 x 2]>
-##  3  0.019440628 0.428  0.0019572343 0.428 <data.frame [999 x 2]>
-##  4  0.031756259 0.792  0.0032535803 0.792 <data.frame [999 x 2]>
-##  5 -0.119584838 0.917 -0.0120549541 0.917 <data.frame [999 x 2]>
-##  6 -0.070920957 0.787 -0.0071306607 0.787 <data.frame [999 x 2]>
-##  7 -0.057251536 0.718 -0.0057770677 0.718 <data.frame [999 x 2]>
-##  8  0.040994881 0.722  0.0042047795 0.722 <data.frame [999 x 2]>
-##  9 -0.041524960 0.672 -0.0041811073 0.672 <data.frame [999 x 2]>
-## 10  0.017522959 0.448  0.0017786491 0.448 <data.frame [999 x 2]>
+##  1 -0.120020796 0.899 -0.0122073685 0.899 <data.frame [999 x 2]>
+##  2  0.069219049 0.250  0.0070207221 0.250 <data.frame [999 x 2]>
+##  3  0.016096664 0.819  0.0016269359 0.819 <data.frame [999 x 2]>
+##  4  0.111602639 0.127  0.0113122685 0.127 <data.frame [999 x 2]>
+##  5 -0.005363237 0.508 -0.0005461089 0.508 <data.frame [999 x 2]>
+##  6  0.021070984 0.415  0.0021449863 0.415 <data.frame [999 x 2]>
+##  7  0.088731109 0.574  0.0090058169 0.574 <data.frame [999 x 2]>
+##  8  0.011790492 0.435  0.0011895302 0.435 <data.frame [999 x 2]>
+##  9 -0.061584697 0.739 -0.0062729773 0.739 <data.frame [999 x 2]>
+## 10  0.024161602 0.408  0.0024630431 0.408 <data.frame [999 x 2]>
 ## # ... with 90 more rows
 ```
 
@@ -599,7 +698,7 @@ sum(resdf$p.rD <= 0.05)/nrow(resdf)
 ```
 
 ```
-## [1] 0.03
+## [1] 0.05
 ```
 
 That's not very many.
@@ -650,6 +749,14 @@ the_plot +
 ![plot of chunk randsamp](./figures/kamvar2017population//randsamp-1.png)
 
 
+# Attempting to make pretty plots
+
+
+Because the ulitmate goal here is to make graphics that may be understandable,
+I'm goint to attempt to create a ridgeline density plot of $\bar{r}_d$ values
+and combine that with a tree of the 20 random samples overlayed on random
+samples from all populations.
+
 
 ```r
 ridgelines <- resdf %>% 
@@ -697,11 +804,11 @@ p_ridge
 ```
 
 ```
-## Picking joint bandwidth of 0.00812
+## Picking joint bandwidth of 0.00871
 ```
 
 ```
-## Warning: Removed 8 rows containing non-finite values (stat_density_ridges).
+## Warning: Removed 4 rows containing non-finite values (stat_density_ridges).
 ```
 
 ![plot of chunk unnamed-chunk-7](./figures/kamvar2017population//unnamed-chunk-7-1.png)
@@ -712,13 +819,20 @@ ggsave(p_ridge, filename = here::here("results/figures/p-ridge.pdf"))
 
 ```
 ## Saving 3.5 x 5 in image
-## Picking joint bandwidth of 0.00812
+## Picking joint bandwidth of 0.00871
 ```
 
 ```
-## Warning: Removed 8 rows containing non-finite values (stat_density_ridges).
+## Warning: Removed 4 rows containing non-finite values (stat_density_ridges).
 ```
 
+
+Here we need to create a tree that is digestable, which means creating one that
+we can easily label. I am first taking one of the data sets that had random
+subsamples and am resampling 19 individuals from each of the 20 populations and
+creating a tree from the resulting 400 individuals. From this tree, I will
+highlight the edges that are found in the subsample and compare those to the
+trees created from within-population subsample.
 
 
 ```r
@@ -784,7 +898,7 @@ dev.off()
 ##                 2
 ```
 
-
+I can use plot_grid from cowplot to combine the main tree and the ridgeline density plot.
 
 
 ```r
@@ -792,11 +906,11 @@ plot_grid(maintree, p_ridge + theme(legend.position = "none"), scale = c(0.8, 1)
 ```
 
 ```
-## Picking joint bandwidth of 0.00812
+## Picking joint bandwidth of 0.00871
 ```
 
 ```
-## Warning: Removed 8 rows containing non-finite values (stat_density_ridges).
+## Warning: Removed 4 rows containing non-finite values (stat_density_ridges).
 ```
 
 ![plot of chunk unnamed-chunk-8](./figures/kamvar2017population//unnamed-chunk-8-1.png)
@@ -807,11 +921,11 @@ plot_grid(maintree, p_ridge + theme(legend.position = "none"), scale = c(0.8, 1)
 ```
 
 ```
-## Picking joint bandwidth of 0.00812
+## Picking joint bandwidth of 0.00871
 ```
 
 ```
-## Warning: Removed 8 rows containing non-finite values (stat_density_ridges).
+## Warning: Removed 4 rows containing non-finite values (stat_density_ridges).
 ```
 
 ```r
@@ -871,7 +985,7 @@ devtools::session_info()
 ##  codetools      0.2-15     2016-10-05 CRAN (R 3.4.0)                     
 ##  colorspace     1.4-0      2017-11-23 R-Forge (R 3.4.2)                  
 ##  compiler       3.4.2      2017-10-04 local                              
-##  cowplot      * 0.9.1      2017-11-27 Github (wilkelab/cowplot@878e67f)  
+##  cowplot      * 0.9.1      2017-12-04 Github (wilkelab/cowplot@89b795c)  
 ##  crayon         1.3.4      2017-09-23 Github (gaborcsardi/crayon@b5221ab)
 ##  datasets     * 3.4.2      2017-10-04 local                              
 ##  DBI            0.7        2017-06-18 CRAN (R 3.4.0)                     
@@ -910,7 +1024,7 @@ devtools::session_info()
 ##  iterators    * 1.0.8      2015-10-13 CRAN (R 3.4.0)                     
 ##  jsonlite       1.5        2017-06-01 CRAN (R 3.4.0)                     
 ##  knitr          1.17       2017-08-10 cran (@1.17)                       
-##  kop          * 0.0.0.9000 2017-11-22 local (@0.0.0.9)                   
+##  kop          * 0.0.0.9000 2017-12-04 local (@0.0.0.9)                   
 ##  labeling       0.3        2014-08-23 CRAN (R 3.4.0)                     
 ##  lattice        0.20-35    2017-03-25 CRAN (R 3.4.0)                     
 ##  lazyeval       0.2.1      2017-10-29 CRAN (R 3.4.2)                     

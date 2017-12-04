@@ -7,4 +7,4 @@ Depends: R (>= 3.4.2)
 License: MIT
 Encoding: UTF-8
 LazyData: true
-Imports: poppr, tidyverse, here, rmarkdown, ezknitr, kop
+Imports: poppr, tidyverse, here, rmarkdown, ezknitr, kop, cowplot, gridGraphics, ggridges
