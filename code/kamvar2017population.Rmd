@@ -36,6 +36,7 @@ Here we are loading the data and packages necessary for the analyses.
 ```{r, message = FALSE, warning = FALSE}
 library("poppr")
 library("tidyverse")
+library("ggridges")
 ```
 
 Now that the packages are loaded, we can load the data:

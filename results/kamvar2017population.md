@@ -33,6 +33,7 @@ Here we are loading the data and packages necessary for the analyses.
 ```r
 library("poppr")
 library("tidyverse")
+library("ggridges")
 ```
 
 Now that the packages are loaded, we can load the data:
@@ -684,19 +685,18 @@ p_ridge <- ggplot(ridgelines, aes(x = rbarD, y = Population, fill = Data, height
   labs(list(
     x = expression(paste(italic(bar(r)[d])))
   ))
-```
-
-```
-## Error in geom_density_ridges(scale = 5): could not find function "geom_density_ridges"
-```
-
-```r
 p_ridge
 ```
 
 ```
-## Error in eval(expr, envir, enclos): object 'p_ridge' not found
+## Picking joint bandwidth of 0.00812
 ```
+
+```
+## Warning: Removed 8 rows containing non-finite values (stat_density_ridges).
+```
+
+![plot of chunk unnamed-chunk-7](./figures/kamvar2017population//unnamed-chunk-7-1.png)
 
 ```r
 ggsave(p_ridge, filename = here::here("results/figures/p-ridge.pdf"))
@@ -704,10 +704,11 @@ ggsave(p_ridge, filename = here::here("results/figures/p-ridge.pdf"))
 
 ```
 ## Saving 3.5 x 5 in image
+## Picking joint bandwidth of 0.00812
 ```
 
 ```
-## Error in grid.draw(plot): object 'p_ridge' not found
+## Warning: Removed 8 rows containing non-finite values (stat_density_ridges).
 ```
 
 
@@ -774,6 +775,7 @@ devtools::session_info()
 ##  foreign       0.8-69     2017-06-21 CRAN (R 3.4.0)                     
 ##  gdata         2.18.0     2017-06-06 CRAN (R 3.4.0)                     
 ##  ggplot2     * 2.2.1      2016-12-30 CRAN (R 3.4.0)                     
+##  ggridges    * 0.4.1      2017-09-15 CRAN (R 3.4.1)                     
 ##  glue          1.2.0      2017-10-29 CRAN (R 3.4.2)                     
 ##  gmodels       2.16.2     2015-07-22 CRAN (R 3.4.0)                     
 ##  graphics    * 3.4.2      2017-10-04 local                              
