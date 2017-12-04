@@ -38,6 +38,8 @@ library("poppr")
 library("tidyverse")
 library("ggridges")
 library("ape")
+library("cowplot")
+library("gridGraphics")
 ```
 
 Now that the packages are loaded, we can load the data:
@@ -348,9 +350,7 @@ fullsize <- samps %>% mutate(cols = case_when(tree == "sampled" ~ 2, TRUE ~ 0.5)
 newedge <- seq(ftree$edge) %in% which.edge(ftree, tail(samps$ind, 20))
 ew      <- ifelse(newedge, 2, 1)
 ec      <- ifelse(newedge, "black", transp("grey50", 0.5))
-treeplot <- function(){
-  m <- matrix(c(rep(1, 20), 2:21), nrow = 4, ncol = 10)
-  l <- layout(m)
+maintree <- function(){
   plot.phylo(ftree, 
              type = "unrooted", 
              show.tip.label = FALSE, 
@@ -359,6 +359,8 @@ treeplot <- function(){
              edge.color = ec)
   tiplabels(pch = 21, bg = fullcol, col = NA, cex = fullsize)
   add.scale.bar(length = 0.1, lwd = 2)
+}
+subtrees <- function(){
   for (i in popNames(test)){
     inds <- samps$ind[samps$pop == i]
     test[inds] %>% 
@@ -371,6 +373,12 @@ treeplot <- function(){
                  edge.color = cols[i])
     add.scale.bar(length = 0.1, lwd = 2)
   }
+}
+treeplot <- function(){
+  m <- matrix(c(rep(1, 20), 2:21), nrow = 4, ncol = 10)
+  l <- layout(m)
+  maintree()
+  subtrees()
   layout(matrix(1, 1, 1))
 }
 treeplot()
@@ -378,6 +386,16 @@ pdf(here::here("results/figures/treeplot.pdf"), width = 6, height = 3.5)
 treeplot()
 dev.off()
 ```
+
+
+
+```{r fig.width = 6, fig.height = 3.5}
+plot_grid(maintree, p_ridge + theme(legend.position = "none"), scale = c(0.8, 1), labels = "AUTO")
+pdf(here::here("results/figures/iatree.pdf"), width = 6, height = 3.5)
+plot_grid(maintree, p_ridge + theme(legend.position = "none"), scale = c(0.8, 1), labels = "AUTO")
+dev.off()
+```
+
 
 
 <details>
