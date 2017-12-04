@@ -733,7 +733,7 @@ What happens when we randomly sample 20 individuals from each population?
 
 
 ```r
-set.seed(2017-11-21)
+set.seed(2017-12-04)
 resampled_rbarD <- seppop(test) %>%
   map_df(resample.ia, n = 20, .id = "Population") %>%
   as_tibble()
@@ -804,11 +804,11 @@ p_ridge
 ```
 
 ```
-## Picking joint bandwidth of 0.00871
+## Picking joint bandwidth of 0.0088
 ```
 
 ```
-## Warning: Removed 4 rows containing non-finite values (stat_density_ridges).
+## Warning: Removed 2 rows containing non-finite values (stat_density_ridges).
 ```
 
 ![plot of chunk unnamed-chunk-7](./figures/kamvar2017population//unnamed-chunk-7-1.png)
@@ -819,11 +819,11 @@ ggsave(p_ridge, filename = here::here("results/figures/p-ridge.pdf"))
 
 ```
 ## Saving 3.5 x 5 in image
-## Picking joint bandwidth of 0.00871
+## Picking joint bandwidth of 0.0088
 ```
 
 ```
-## Warning: Removed 4 rows containing non-finite values (stat_density_ridges).
+## Warning: Removed 2 rows containing non-finite values (stat_density_ridges).
 ```
 
 
@@ -837,7 +837,7 @@ trees created from within-population subsample.
 
 ```r
 s1 <- subsamples[[1]]
-set.seed(2017-11-21)
+set.seed(2017-12-04)
 samps <- data_frame(pop = pop(test), ind = indNames(test)) %>% 
   filter(!ind %in% indNames(s1)) %>%
   group_by(pop) %>%
@@ -902,39 +902,19 @@ I can use plot_grid from cowplot to combine the main tree and the ridgeline dens
 
 
 ```r
-plot_grid(maintree, p_ridge + theme(legend.position = "none"), scale = c(0.8, 1), labels = "AUTO")
+p <- plot_grid(maintree, p_ridge + theme(legend.position = "none"), scale = c(0.8, 1), labels = "AUTO")
 ```
 
 ```
-## Picking joint bandwidth of 0.00871
+## Picking joint bandwidth of 0.0088
 ```
 
 ```
-## Warning: Removed 4 rows containing non-finite values (stat_density_ridges).
-```
-
-![plot of chunk unnamed-chunk-8](./figures/kamvar2017population//unnamed-chunk-8-1.png)
-
-```r
-pdf(here::here("results/figures/iatree.pdf"), width = 6, height = 3.5)
-plot_grid(maintree, p_ridge + theme(legend.position = "none"), scale = c(0.8, 1), labels = "AUTO")
-```
-
-```
-## Picking joint bandwidth of 0.00871
-```
-
-```
-## Warning: Removed 4 rows containing non-finite values (stat_density_ridges).
+## Warning: Removed 2 rows containing non-finite values (stat_density_ridges).
 ```
 
 ```r
-dev.off()
-```
-
-```
-## pdf 
-##   3
+ggsave(filename = here::here("results/figures/iatree.pdf"), plot = p, width = 6, height = 3.5)
 ```
 
 

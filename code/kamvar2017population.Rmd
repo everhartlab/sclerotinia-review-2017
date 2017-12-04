@@ -284,7 +284,7 @@ the_plot + geom_vline(xintercept = ccia$rbarD, lty = 3)
 What happens when we randomly sample 20 individuals from each population?
 
 ```{r randsamp, fig.width = 10, fig.height = 5, cache = TRUE, dependson = "resample_populations"}
-set.seed(2017-11-21)
+set.seed(2017-12-04)
 resampled_rbarD <- seppop(test) %>%
   map_df(resample.ia, n = 20, .id = "Population") %>%
   as_tibble()
@@ -355,7 +355,7 @@ trees created from within-population subsample.
 
 ```{r treecomparison, fig.width = 6, fig.height = 3.5}
 s1 <- subsamples[[1]]
-set.seed(2017-11-21)
+set.seed(2017-12-04)
 samps <- data_frame(pop = pop(test), ind = indNames(test)) %>% 
   filter(!ind %in% indNames(s1)) %>%
   group_by(pop) %>%
@@ -409,10 +409,8 @@ dev.off()
 I can use plot_grid from cowplot to combine the main tree and the ridgeline density plot.
 
 ```{r fig.width = 6, fig.height = 3.5}
-plot_grid(maintree, p_ridge + theme(legend.position = "none"), scale = c(0.8, 1), labels = "AUTO")
-pdf(here::here("results/figures/iatree.pdf"), width = 6, height = 3.5)
-plot_grid(maintree, p_ridge + theme(legend.position = "none"), scale = c(0.8, 1), labels = "AUTO")
-dev.off()
+p <- plot_grid(maintree, p_ridge + theme(legend.position = "none"), scale = c(0.8, 1), labels = "AUTO")
+ggsave(filename = here::here("results/figures/iatree.pdf"), plot = p, width = 6, height = 3.5)
 ```
 
 
