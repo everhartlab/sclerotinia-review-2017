@@ -836,7 +836,7 @@ trees created from within-population subsample.
 
 
 ```r
-s1 <- subsamples[[2]]
+s1 <- subsamples[[1]]
 set.seed(2017-11-21)
 samps <- data_frame(pop = pop(test), ind = indNames(test)) %>% 
   filter(!ind %in% indNames(s1)) %>%
