@@ -1,7 +1,7 @@
 ---
 title: "MCG assessment of Kamvar et al 2017"
 author: "Zhian N. Kamvar"
-date: "2017-12-01"
+date: "2017-12-04"
 output: github_document
 bibliography: bibliography.bib
 editor_options: 
@@ -625,15 +625,90 @@ What happens when we randomly sample 20 individuals from each population?
 
 
 ```r
+set.seed(2017-11-21)
 resampled_rbarD <- seppop(test) %>%
-  map(resample.ia, n = 20) %>%
-  map_dbl(~{ mean (.$rbarD)})
+  map_df(resample.ia, n = 20, .id = "Population") %>%
+  as_tibble()
+resampled_rbarD_res <- resampled_rbarD %>% 
+  group_by(Population) %>% 
+  summarize(rbarD = mean(rbarD)) %>% 
+  pull(rbarD)
 the_plot + 
-  geom_vline(xintercept = resampled_rbarD, lty = 3) +
+  geom_vline(xintercept = resampled_rbarD_res, lty = 3) +
   labs(caption = expression(paste("(dashed lines: resampled ", bar(r)[d], " values)")))
 ```
 
 ![plot of chunk randsamp](./figures/kamvar2017population//randsamp-1.png)
+
+
+
+```r
+ridgelines <- resdf %>% 
+  select(Ia, rbarD) %>% 
+  add_column(Population = "pooled") %>% 
+  bind_rows(resampled_rbarD, .id = "Data") %>% 
+  mutate(Data = case_when(Population == "pooled" ~ "pooled", TRUE ~ "single")) %>% 
+  mutate(Population = case_when(
+           grepl("unknown", Population) ~ sprintf("pop %2d", as.integer(gsub("unknown_", "", Population))),
+           TRUE ~ Population
+           )) %>% 
+  group_by(Population) %>% 
+  mutate(m = mean(rbarD)) %>% 
+  arrange(m) %>% 
+  select(-m) %>% 
+  ungroup() %>% 
+  mutate(Population = fct_inorder(Population))
+```
+
+```
+## Warning in sprintf("pop %2d", as.integer(gsub("unknown_", "", Population))): NAs
+## introduced by coercion
+```
+
+```r
+p_ridge <- ggplot(ridgelines, aes(x = rbarD, y = Population, fill = Data, height = ..density..)) + 
+  geom_density_ridges(scale = 5) +
+  theme_ridges(font_size = 16, font_family = "Helvetica", grid = TRUE, center_axis_labels = TRUE) +
+  scale_x_continuous(limits = c(NA, 0.4), breaks = c(0, 0.2, 0.4)) +
+  scale_y_discrete(expand = c(0.01, 0)) +
+  theme(aspect.ratio = 1.25) +
+  theme(legend.position = "top") +
+  theme(legend.justification = "center") +
+  theme(axis.text.y = element_blank()) +
+  theme(axis.ticks.y = element_blank()) +
+  theme(axis.ticks.x = element_blank()) +
+  theme(axis.title.y = element_blank()) +
+  theme(panel.grid.major.y = element_blank()) +
+  theme(panel.grid.major.x = element_line(linetype = 3, color = "grey50")) +
+  scale_fill_manual(values = c("grey20", "grey80")) +
+  labs(list(
+    x = expression(paste(italic(bar(r)[d])))
+  ))
+```
+
+```
+## Error in geom_density_ridges(scale = 5): could not find function "geom_density_ridges"
+```
+
+```r
+p_ridge
+```
+
+```
+## Error in eval(expr, envir, enclos): object 'p_ridge' not found
+```
+
+```r
+ggsave(p_ridge, filename = here::here("results/figures/p-ridge.pdf"))
+```
+
+```
+## Saving 3.5 x 5 in image
+```
+
+```
+## Error in grid.draw(plot): object 'p_ridge' not found
+```
 
 
 <details>
@@ -656,7 +731,7 @@ devtools::session_info()
 ##  language (EN)                        
 ##  collate  en_US.UTF-8                 
 ##  tz       America/Chicago             
-##  date     2017-12-01
+##  date     2017-12-04
 ```
 
 ```
@@ -672,7 +747,7 @@ devtools::session_info()
 ##  backports     1.1.1      2017-09-25 CRAN (R 3.4.2)                     
 ##  base        * 3.4.2      2017-10-04 local                              
 ##  bindr         0.1        2016-11-13 CRAN (R 3.4.0)                     
-##  bindrcpp      0.2        2017-06-17 CRAN (R 3.4.0)                     
+##  bindrcpp    * 0.2        2017-06-17 CRAN (R 3.4.0)                     
 ##  boot          1.3-20     2017-07-30 CRAN (R 3.4.1)                     
 ##  broom         0.4.2      2017-02-13 CRAN (R 3.4.0)                     
 ##  cellranger    1.1.0      2016-07-27 CRAN (R 3.4.0)                     
