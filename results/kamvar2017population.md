@@ -34,6 +34,7 @@ Here we are loading the data and packages necessary for the analyses.
 library("poppr")
 library("tidyverse")
 library("ggridges")
+library("ape")
 ```
 
 Now that the packages are loaded, we can load the data:
@@ -582,6 +583,11 @@ resdf <- map(res, 1) %>%
 ## # ... with 90 more rows
 ```
 
+
+> This simulation take a long time to run. When you come back to it, use the 
+> function `lazierLoad("cache")` to reload all of the saved results:
+> `source("https://gist.githubusercontent.com/zkamvar/655be26d1d5bec1ac948/raw/97db57030d016a0e7a8156aa84ad02a7c8bc644c/lazierLoad.R")`
+
 Now we can see what fraction of the simulations resulted in a significant value
 of $\bar{r}_d$
 
@@ -712,6 +718,65 @@ ggsave(p_ridge, filename = here::here("results/figures/p-ridge.pdf"))
 ```
 
 
+
+```r
+s1 <- subsamples[[2]]
+set.seed(2017-11-21)
+samps <- data_frame(pop = pop(test), ind = indNames(test)) %>% 
+  filter(!ind %in% indNames(s1)) %>%
+  group_by(pop) %>%
+  sample_n(19) %>%
+  bind_rows(unsampled = ., sampled = data_frame(pop = pop(s1), ind = indNames(s1)), .id = "tree")
+
+ftree  <- diss.dist(test[samps$ind], percent = TRUE) %>% nj()
+cols    <- setNames(adegenet::funky(nPop(test)), popNames(test))
+fullcol  <- samps %>% mutate(cols = case_when(tree == "sampled" ~ cols[pop], TRUE ~ transp(cols[pop], 0.5))) %>% pull(cols)
+fullsize <- samps %>% mutate(cols = case_when(tree == "sampled" ~ 2, TRUE ~ 0.5)) %>% pull(cols)
+newedge <- seq(ftree$edge) %in% which.edge(ftree, tail(samps$ind, 20))
+ew      <- ifelse(newedge, 2, 1)
+ec      <- ifelse(newedge, "black", transp("grey50", 0.5))
+treeplot <- function(){
+  m <- matrix(c(rep(1, 20), 2:21), nrow = 4, ncol = 10)
+  l <- layout(m)
+  plot.phylo(ftree, 
+             type = "unrooted", 
+             show.tip.label = FALSE, 
+             no.margin = TRUE, 
+             edge.width = ew, 
+             edge.color = ec)
+  tiplabels(pch = 21, bg = fullcol, col = NA, cex = fullsize)
+  add.scale.bar(length = 0.1, lwd = 2)
+  for (i in popNames(test)){
+    inds <- samps$ind[samps$pop == i]
+    test[inds] %>% 
+      diss.dist(percent = TRUE) %>%
+      nj() %>%
+      plot.phylo(type = "unrooted", 
+                 show.tip.label = FALSE, 
+                 no.margin = TRUE, 
+                 edge.width = 2,
+                 edge.color = cols[i])
+    add.scale.bar(length = 0.1, lwd = 2)
+  }
+  layout(matrix(1, 1, 1))
+}
+treeplot()
+```
+
+![plot of chunk treecomparison](./figures/kamvar2017population//treecomparison-1.png)
+
+```r
+pdf(here::here("results/figures/treeplot.pdf"), width = 6, height = 3.5)
+treeplot()
+dev.off()
+```
+
+```
+## quartz_off_screen 
+##                 2
+```
+
+
 <details>
 <summary>Session Information</summary>
 
@@ -743,7 +808,7 @@ devtools::session_info()
 ##  package     * version    date       source                             
 ##  ade4        * 1.7-8      2017-11-19 Github (sdray/ade4@2ee45cb)        
 ##  adegenet    * 2.1.0      2017-10-12 CRAN (R 3.4.2)                     
-##  ape           5.0        2017-10-30 CRAN (R 3.4.2)                     
+##  ape         * 5.0        2017-10-30 CRAN (R 3.4.2)                     
 ##  assertthat    0.2.0      2017-04-11 CRAN (R 3.4.0)                     
 ##  backports     1.1.1      2017-09-25 CRAN (R 3.4.2)                     
 ##  base        * 3.4.2      2017-10-04 local                              
