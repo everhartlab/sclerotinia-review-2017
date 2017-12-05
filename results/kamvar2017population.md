@@ -1,7 +1,7 @@
 ---
 title: "MCG assessment of Kamvar et al 2017"
 author: "Zhian N. Kamvar"
-date: "2017-12-04"
+date: "2017-12-05"
 output: github_document
 bibliography: bibliography.bib
 editor_options: 
@@ -898,11 +898,139 @@ dev.off()
 ##                 2
 ```
 
+# Example populations
+
+I can use base graphics to draw example populations:
+
+
+```r
+rando_points <- function(x, y, spread = 0.025){
+  rX <- range(x)
+  rX <- rX + ( rX * c(-spread, spread) )
+  rY <- range(y)
+  rY <- rY + ( rY * c(-spread, spread) )
+  X <- runif(20, rX[1], rX[2])
+  Y <- runif(20, rY[1], rY[2])
+  points(X, Y, pch = 21, bg = c(rep(NA, 19), "white"))
+}
+
+plot_fields <- function(N = 100, space = 500, spread = 0.025){
+  res <- matrix(nrow = 20 * N, ncol = 2)
+  counter <- 1
+  for (i in space * (1:5)){
+    for (j in space * (1:4)){
+      stop <- counter + N - 1
+      res[counter:stop, 1] <- rnorm(N, mean = i, sd = 10)
+      res[counter:stop, 2] <- rnorm(N, mean = j, sd = 10)
+      counter <- stop + 1
+    }
+  }
+  
+  pops <- res %>% 
+    as_data_frame() %>%
+    set_names(c("x", "y")) %>%
+    add_column(group = rep(LETTERS[1:20], each = N))
+  
+  islands <- pops %>%
+    group_by(group) %>%
+    summarize(X = mean(x), Y = mean(y), rad = sd(x))
+  
+  opar <- par(no.readonly = TRUE)
+  on.exit(par(opar))
+  par(mar = rep(0.1, 4))
+  
+  # creating background
+  symbols(islands$X, islands$Y, 
+          circles = islands$rad*10, 
+          inches = FALSE, 
+          bg = adegenet::funky(20),
+          asp = 1,
+          bty = "n",
+          xaxt = "n",
+          xlab = NA,
+          yaxt = "n",
+          ylab = NA)
+  rect(
+    par("usr")[1],
+    par("usr")[3],
+    par("usr")[2],
+    par("usr")[4],
+    col = "white",
+    border = NA
+    )
+  
+  # Drawing "islands"
+  symbols(islands$X, islands$Y, 
+          circles = islands$rad*10, 
+          inches = FALSE, 
+          bg = adegenet::funky(20),
+          asp = 1,
+          bty = "n",
+          xaxt = "n",
+          xlab = NA,
+          yaxt = "n",
+          ylab = NA,
+          add = TRUE)
+
+  # Drawing samples
+  for (i in unique(pops$group)){
+    res <- filter(pops, group == i)
+    rando_points(res$x, res$y, spread = spread)
+  }
+}
+set.seed(2017-12-05)
+plot_fields(space = 500, spread = 0.03)
+```
+
+![plot of chunk fieldplot](./figures/kamvar2017population//fieldplot-1.png)
+
+
 I can use plot_grid from cowplot to combine the main tree and the ridgeline density plot.
 
 
 ```r
-p <- plot_grid(maintree, p_ridge + theme(legend.position = "none"), scale = c(0.8, 1), labels = "AUTO")
+# p <- plot_grid(function() plot_fields(space = 1000), maintree, p_ridge + theme(legend.position = "none"), 
+#                ncol = 2,
+#                rel_heights = c(0.5, 0.5, 0.5),
+#                rel_widths = c(1, 0.4, 0.6),
+#                labels = "AUTO")
+# p
+set.seed(2017-12-05)
+ cowplot::ggdraw(xlim = c(0, 1), ylim = c(-0.25, 1)) +
+  cowplot::draw_plot(function() plot_fields(N = 1000, space = 500, spread = 0.035), 
+                     x = 0.125, 
+                     y = 0.33, 
+                     height = 0.66, 
+                     width = 0.75) +
+  cowplot::draw_plot(p_ridge + theme(legend.position = "none") + theme(asp = 1), 
+                     x = 0.5, 
+                     y = -0.25, 
+                     height = 0.33 + 0.25, 
+                     width = 0.6) +
+  cowplot::draw_plot(maintree, 
+                     x = 0.025, 
+                     y = -0.225, 
+                     width = 0.5, 
+                     height = 0.33 + 0.25) +
+  cowplot::draw_plot_label(c("A", "B", "C"), 
+                           x = c(0.025, 0.025, 0.55), 
+                           y = c(0.975, 0.35, 0.35), size = 25)
+```
+
+```
+## Warning in par(inlinePars): "asp" is not a graphical parameter
+```
+
+```
+## Warning in par(opar): "asp" is not a graphical parameter
+```
+
+```
+## Warning in par(inlinePars): "asp" is not a graphical parameter
+```
+
+```
+## Warning in par(opar): "asp" is not a graphical parameter
 ```
 
 ```
@@ -913,8 +1041,22 @@ p <- plot_grid(maintree, p_ridge + theme(legend.position = "none"), scale = c(0.
 ## Warning: Removed 2 rows containing non-finite values (stat_density_ridges).
 ```
 
+![plot of chunk unnamed-chunk-8](./figures/kamvar2017population//unnamed-chunk-8-1.png)
+
 ```r
-ggsave(filename = here::here("results/figures/iatree.pdf"), plot = p, width = 6, height = 3.5)
+ggsave(filename = here::here("results/figures/iatree.pdf"), plot = p, width = 6, height = 6)
+```
+
+```
+## Error in grid::grid.draw(plot): object 'p' not found
+```
+
+```r
+ggsave(filename = here::here("results/figures/iatree.png"), plot = p, width = 6, height = 6, dpi = 600)
+```
+
+```
+## Error in grid::grid.draw(plot): object 'p' not found
 ```
 
 
@@ -939,7 +1081,7 @@ devtools::session_info()
 ##  language (EN)                        
 ##  collate  en_US.UTF-8                 
 ##  tz       America/Chicago             
-##  date     2017-12-04
+##  date     2017-12-05
 ```
 
 ```
@@ -948,7 +1090,7 @@ devtools::session_info()
 
 ```
 ##  package      * version    date       source                             
-##  ade4         * 1.7-8      2017-11-19 Github (sdray/ade4@2ee45cb)        
+##  ade4         * 1.7-8      2017-12-05 Github (sdray/ade4@bc33825)        
 ##  adegenet     * 2.1.0      2017-10-12 CRAN (R 3.4.2)                     
 ##  ape          * 5.0        2017-10-30 CRAN (R 3.4.2)                     
 ##  assertthat     0.2.0      2017-04-11 CRAN (R 3.4.0)                     
