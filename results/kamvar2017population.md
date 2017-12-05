@@ -996,7 +996,7 @@ I can use plot_grid from cowplot to combine the main tree and the ridgeline dens
 #                labels = "AUTO")
 # p
 set.seed(2017-12-05)
- cowplot::ggdraw(xlim = c(0, 1), ylim = c(-0.25, 1)) +
+p <-  cowplot::ggdraw(xlim = c(0, 1), ylim = c(-0.25, 1)) +
   cowplot::draw_plot(function() plot_fields(N = 1000, space = 500, spread = 0.035), 
                      x = 0.125, 
                      y = 0.33, 
@@ -1041,22 +1041,15 @@ set.seed(2017-12-05)
 ## Warning: Removed 2 rows containing non-finite values (stat_density_ridges).
 ```
 
+```r
+p
+```
+
 ![plot of chunk unnamed-chunk-8](./figures/kamvar2017population//unnamed-chunk-8-1.png)
 
 ```r
 ggsave(filename = here::here("results/figures/iatree.pdf"), plot = p, width = 6, height = 6)
-```
-
-```
-## Error in grid::grid.draw(plot): object 'p' not found
-```
-
-```r
 ggsave(filename = here::here("results/figures/iatree.png"), plot = p, width = 6, height = 6, dpi = 600)
-```
-
-```
-## Error in grid::grid.draw(plot): object 'p' not found
 ```
 
 
