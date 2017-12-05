@@ -312,10 +312,10 @@ ridgelines <- resdf %>%
   add_column(Population = "pooled") %>% 
   bind_rows(resampled_rbarD, .id = "Data") %>% 
   mutate(Data = case_when(Population == "pooled" ~ "pooled", TRUE ~ "single")) %>% 
-  mutate(Population = case_when(
-           grepl("unknown", Population) ~ sprintf("pop %2d", as.integer(gsub("unknown_", "", Population))),
-           TRUE ~ Population
-           )) %>% 
+  # mutate(Population = case_when(
+  #          grepl("unknown", Population) ~ sprintf("pop %2d", as.integer(gsub("unknown_", "", Population))),
+  #          TRUE ~ Population
+  #          )) %>% 
   group_by(Population) %>% 
   mutate(m = mean(rbarD)) %>% 
   arrange(m) %>% 
@@ -323,7 +323,15 @@ ridgelines <- resdf %>%
   ungroup() %>% 
   mutate(Population = fct_inorder(Population))
 
-p_ridge <- ggplot(ridgelines, aes(x = rbarD, y = Population, fill = Data, height = ..density..)) + 
+## Function for desaturating colors by specified proportion
+desat <- function(cols, sat=0.5) {
+    X <- diag(c(1, sat, 1)) %*% rgb2hsv(col2rgb(cols))
+    hsv(X[1,], X[2,], X[3,])
+}
+
+popcolors <- setNames(adegenet::funky(nPop(test)), adegenet::popNames(test))
+
+p_ridge <- ggplot(ridgelines, aes(x = rbarD, y = Population, fill = Population, height = ..density..)) + 
   geom_density_ridges(scale = 5) +
   theme_ridges(font_size = 16, font_family = "Helvetica", grid = TRUE, center_axis_labels = TRUE) +
   scale_x_continuous(limits = c(NA, 0.4), breaks = c(0, 0.2, 0.4)) +
@@ -337,7 +345,7 @@ p_ridge <- ggplot(ridgelines, aes(x = rbarD, y = Population, fill = Data, height
   theme(axis.title.y = element_blank()) +
   theme(panel.grid.major.y = element_blank()) +
   theme(panel.grid.major.x = element_line(linetype = 3, color = "grey50")) +
-  scale_fill_manual(values = c("grey20", "grey80")) +
+  scale_fill_manual(values = c(pooled = "black", popcolors)) +
   labs(list(
     x = expression(paste(italic(bar(r)[d])))
   ))
@@ -418,7 +426,8 @@ rando_points <- function(x, y, spread = 0.025){
   rY <- rY + ( rY * c(-spread, spread) )
   X <- runif(20, rX[1], rX[2])
   Y <- runif(20, rY[1], rY[2])
-  points(X, Y, pch = 21, bg = c(rep(NA, 19), "white"))
+  points(X, Y, pch = 21, col = c(adegenet::transp(rep("grey30", 19), 0.5), "black"), 
+         bg = c(adegenet::transp(rep("white", 19), 0.5), "grey30"))
 }
 
 plot_fields <- function(N = 100, space = 500, spread = 0.025){
