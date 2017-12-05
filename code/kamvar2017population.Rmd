@@ -419,33 +419,37 @@ dev.off()
 I can use base graphics to draw example populations:
 
 ```{r fieldplot}
-rando_points <- function(x, y, spread = 0.025){
+rando_points <- function(N = 20, x, y, xm, ym, spread = 25){
   rX <- range(x)
-  rX <- rX + ( rX * c(-spread, spread) )
+  rX <- rX + ( rX * c(-spread, spread) * 1/xm )
   rY <- range(y)
-  rY <- rY + ( rY * c(-spread, spread) )
-  X <- runif(20, rX[1], rX[2])
-  Y <- runif(20, rY[1], rY[2])
-  points(X, Y, pch = 21, col = c(adegenet::transp(rep("grey30", 19), 0.5), "black"), 
-         bg = c(adegenet::transp(rep("white", 19), 0.5), "grey30"))
+  rY <- rY + ( rY * c(-spread, spread) * 1/ym)
+  X <- runif(N, rX[1], rX[2])
+  Y <- runif(N, rY[1], rY[2])
+  points(X, Y, pch = 21, col = c(adegenet::transp(rep("grey30", N - 1), 0.5), "black"), 
+         bg = c(adegenet::transp(rep("white", N - 1), 0.5), "grey30"))
 }
 
-plot_fields <- function(N = 100, space = 500, spread = 0.025){
-  res <- matrix(nrow = 20 * N, ncol = 2)
+plot_fields <- function(N = 100, P = 20, S = 20, space = 500, spread = 25){
+  res <- matrix(nrow = P * N, ncol = 4)
+  rows <- floor(sqrt(P))
+  columns <- ceiling(P/rows)
   counter <- 1
-  for (i in space * (1:5)){
-    for (j in space * (1:4)){
+  for (i in space * (1:columns)){
+    for (j in space * (1:rows)){
       stop <- counter + N - 1
       res[counter:stop, 1] <- rnorm(N, mean = i, sd = 10)
       res[counter:stop, 2] <- rnorm(N, mean = j, sd = 10)
+      res[counter:stop, 3] <- i
+      res[counter:stop, 4] <- j
       counter <- stop + 1
     }
   }
   
   pops <- res %>% 
     as_data_frame() %>%
-    set_names(c("x", "y")) %>%
-    add_column(group = rep(LETTERS[1:20], each = N))
+    set_names(c("x", "y", "xm", "ym")) %>%
+    add_column(group = rep(seq.int(P), each = N))
   
   islands <- pops %>%
     group_by(group) %>%
@@ -457,9 +461,9 @@ plot_fields <- function(N = 100, space = 500, spread = 0.025){
   
   # creating background
   symbols(islands$X, islands$Y, 
-          circles = islands$rad*10, 
+          circles = islands$rad * 10, 
           inches = FALSE, 
-          bg = adegenet::funky(20),
+          bg = adegenet::funky(P),
           asp = 1,
           bty = "n",
           xaxt = "n",
@@ -477,9 +481,9 @@ plot_fields <- function(N = 100, space = 500, spread = 0.025){
   
   # Drawing "islands"
   symbols(islands$X, islands$Y, 
-          circles = islands$rad*10, 
+          circles = islands$rad * 10, 
           inches = FALSE, 
-          bg = adegenet::funky(20),
+          bg = adegenet::funky(P),
           asp = 1,
           bty = "n",
           xaxt = "n",
@@ -491,11 +495,11 @@ plot_fields <- function(N = 100, space = 500, spread = 0.025){
   # Drawing samples
   for (i in unique(pops$group)){
     res <- filter(pops, group == i)
-    rando_points(res$x, res$y, spread = spread)
+    rando_points(S, res$x, res$y, res$xm, res$ym, spread = spread)
   }
 }
 set.seed(2017-12-05)
-plot_fields(space = 500, spread = 0.03)
+plot_fields(space = 500)
 ```
 
 
@@ -510,7 +514,7 @@ I can use plot_grid from cowplot to combine the main tree and the ridgeline dens
 # p
 set.seed(2017-12-05)
 p <-  cowplot::ggdraw(xlim = c(0, 1), ylim = c(-0.25, 1)) +
-  cowplot::draw_plot(function() plot_fields(N = 1000, space = 500, spread = 0.035), 
+  cowplot::draw_plot(function() plot_fields(N = 1000, space = 500, spread = 70), 
                      x = 0.125, 
                      y = 0.33, 
                      height = 0.66, 
