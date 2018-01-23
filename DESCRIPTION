@@ -1,8 +1,8 @@
 Package: ScleroMCG
-Title:
+Title: A simulation analysis
 Version: 0.0.0.9000
 Author: Zhian N. Kamvar, Sydney E. Everhart
-Description: An analysis of...
+Description: Dependencies for creating the figures for this review
 Depends: R (>= 3.4.2)
 License: MIT
 Encoding: UTF-8
