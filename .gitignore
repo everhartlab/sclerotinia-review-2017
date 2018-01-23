@@ -5,6 +5,8 @@
 results/bootstrap.txt
 results/*docx
 results/*pdf
+figures/*pdf
+figures/*tiff
 results/*html
 code/*cache/
 results/*_files/*docx*
