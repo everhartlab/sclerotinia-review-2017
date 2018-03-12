@@ -39,7 +39,7 @@ clean:
          pdf \
          docx \
          review-pdf.{tex,out,aux,log} \
-         review.{tex,out,docx,aux,log} \
+         review.{tex,out,aux,log} \
          *.aux
 
 .PHONY: cleanall
