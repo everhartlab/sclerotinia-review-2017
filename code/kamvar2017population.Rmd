@@ -535,6 +535,7 @@ p <-  cowplot::ggdraw(xlim = c(0, 1), ylim = c(-0.25, 1)) +
 p
 ggsave(filename = here::here("results/figures/iatree.pdf"), plot = p, width = 6, height = 6)
 ggsave(filename = here::here("results/figures/iatree.png"), plot = p, width = 6, height = 6, dpi = 600)
+ggsave(filename = here::here("figures/iatree.tiff"), plot = p, width = 6, height = 6, dpi = 900)
 ```
 
 

@@ -1056,6 +1056,7 @@ p
 ```r
 ggsave(filename = here::here("results/figures/iatree.pdf"), plot = p, width = 6, height = 6)
 ggsave(filename = here::here("results/figures/iatree.png"), plot = p, width = 6, height = 6, dpi = 600)
+ggsave(filename = here::here("figures/iatree.tiff"), plot = p, width = 6, height = 6, dpi = 900)
 ```
 
 

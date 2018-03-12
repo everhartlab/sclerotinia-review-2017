@@ -105,7 +105,6 @@ in *S. sclerotiorum*, 44 candidate genes have recently been identified,
 which may explain the diversity of MCG found across studies
 [@Wu2017-dx].
 
-
 Study                       N  MLH  MCG  MCG concordance
 ----------------------- ----- ---- ---- ----------------
 @Kohn1991-wq              63   33   32          31/32
