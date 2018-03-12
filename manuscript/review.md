@@ -105,27 +105,21 @@ in *S. sclerotiorum*, 44 candidate genes have recently been identified,
 which may explain the diversity of MCG found across studies
 [@Wu2017-dx].
 
-In this review, we will address inconsistencies between haplotype and
-MCG assignments, discuss proposed hypotheses that explain these
-patterns, and suggest a path forward for future population genetic
-studies of *S. sclerotiorum*. The first step is to acknowledge the fact
-that mycelial compatibility is not equivalent to vegetative
-compatibility.
 
-Study                   N  MLH  MCG  MCG concordance
-------------------- ----- ---- ---- ----------------
-@Kohn1991-wq          63   33   32          31/32
-@Kohli1992-pe         66   39   36          33/36
-@Cubeta1997-rr        84   50   41          32/41
-@Carbone2001-hi       64   19   15          7/15
-@Hambleton2002-an     213  41   21          16/21
-@Atallah2004-es       167  145  82          NA
-@Malvarez2007-jo      294  152  141         130/141
-@Attanayake2012-mq    40   16   15          7/15
-@Barari2012-dn        65   44   26          22/26
-@Lehner2015-oj        118  70   14          4/14
-@Lehner2017-mm        187  46   34          24/34
-@Kamvar2017-cl        366  165  87          15/87
+Study                       N  MLH  MCG  MCG concordance
+----------------------- ----- ---- ---- ----------------
+@Kohn1991-wq              63   33   32          31/32
+@Kohli1992-pe             66   39   36          33/36
+@Cubeta1997-rr            84   50   41          32/41
+@Carbone2001-hi           64   19   15          7/15
+@Hambleton2002-an         213  41   21          16/21
+@Atallah2004-es           167  145  82          NA
+@Malvarez2007-jo          294  152  141         130/141
+@Attanayake2012-mq        40   16   15          7/15
+@Barari2012-dn            65   44   26          22/26
+@Lehner2015-oj            118  70   14          4/14
+@Lehner2017-mm            187  46   34          24/34
+@Kamvar2017-cl            366  165  87          15/87
 
 Table: \label{tab:meta} A selection of studies that included both MCG and MLH
 characterization of *Sclerotinia sclerotiorum* in their analysis and
@@ -133,6 +127,12 @@ results of their work. N = number of samples, MLH = number of multilocus
 haplotypes, MCG = number of mycelial compatibility groups, MCG concordance =
 number of MCG that belonged to a single MLH.
 
+In this review, we will address inconsistencies between haplotype and
+MCG assignments, discuss proposed hypotheses that explain these
+patterns, and suggest a path forward for future population genetic
+studies of *S. sclerotiorum*. The first step is to acknowledge the fact
+that mycelial compatibility is not equivalent to vegetative
+compatibility.
 
 # Mycelial compatibility is not vegetative compatibility
 
