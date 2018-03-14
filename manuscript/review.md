@@ -346,7 +346,7 @@ between identical genotypes would appear to be no different than clonal
 reproduction. If populations were analyzed for linkage without taking
 MCG into account, the results could give signatures of random mating due
 to sampling from several independent clonal populations
-[@Prugnolle2010-yb; @Lehner2017-ny]. However, It has been shown in
+[@Prugnolle2010-yb; @Lehner2017-ny]. However, it has been shown in
 other ascomycetes that vegetative incompatibility is not a barrier to
 recombination and, in *S. sclerotiorum*, mycelial incompatibility is not
 a barrier to vegetative compatibility

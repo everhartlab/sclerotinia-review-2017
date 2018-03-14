@@ -18,7 +18,7 @@ pdf/%.tex : %.md pandoc.css references.bib | pdf
       --css pandoc.css \
       --output $@ $<
 
-review.tex : pdf/review.tex | pdf
+review.tex : pdf/review.tex correct-authors.tex formatted-citations.tex | pdf
 	sed "s/^.author/\\\\input{correct-authors.tex}%\\\\author/" $< \
 	| sed "s/^.institute/%\\\\institute/" > review.tex
 	bash replace-citations.sh
