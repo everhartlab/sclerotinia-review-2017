@@ -4,13 +4,15 @@ author: "Zhian N. Kamvar"
 date: "`r Sys.Date()`"
 output: github_document
 bibliography: bibliography.bib
-editor_options: 
+editor_options:
   chunk_output_type: inline
 ---
 
 ```{r setup, include=FALSE}
 options(width = 90) 
 knitr::opts_knit$set(root.dir = here::here())
+knitr::opts_chunk$set(fig.path = "./results/figures/kamvar2017population/")
+knitr::opts_chunk$set(cache.path = here::here("code/kamvar2017population_cache/"))
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
@@ -31,7 +33,7 @@ via the standardized index of association, $\bar{r}_d$ as implemented in the
 Packages and Data
 -----------------
 
-Here we are loading the data and packages necessary for the analyses. 
+Here we are loading the data and packages necessary for the analyses.
 
 ```{r, message = FALSE, warning = FALSE}
 library("poppr")
@@ -78,16 +80,16 @@ replen <- c(
 "110-4(H)" = 3.99999,
 "114-4(H)" = 4
 )
-loci_to_keep <- c("5-2(F)", "6-2(F)", "7-2(F)", "8-3(H)", "9-2(F)", "12-2(H)", 
+loci_to_keep <- c("5-2(F)", "6-2(F)", "7-2(F)", "8-3(H)", "9-2(F)", "12-2(H)",
 "17-3(H)", "20-3(F)", "55-4(F)", "110-4(H)", "114-4(H)")
 ```
 
 Now we can use these to subset our data:
 
 ```{r}
-dat11 <- dat %>% 
+dat11 <- dat %>%
   select(loci_to_keep) %>%
-  df2genind(strata = select(dat, Region, Source, Host, MCG, Year), 
+  df2genind(strata = select(dat, Region, Source, Host, MCG, Year),
             ind.names = dat$Isolate,
             ploidy = 1) %>%
   as.genclone()
@@ -111,7 +113,7 @@ reduces the power of the index of association and can make clonal populations
 appear to be sexual.
 
 ```{r by-mcg, cache = TRUE}
-dat11 %>% 
+dat11 %>%
   setPop(~MCG) %>%                   # set population to MCGs
   selPopSize(n = 10) %>%             # constrain to 10 samples per population
   poppr(sample = 999, total = FALSE) # test index of association for each pop
@@ -122,7 +124,7 @@ correct our data? We'll use the scheme in [@kamvar2017data], adding MCG as the
 highest level:
 
 ```{r by-mcg-cc, cache = TRUE}
-dat11 %>% 
+dat11 %>%
   setPop(~MCG) %>%                   # set population to MCGs
   selPopSize(n = 10) %>%             # constrain to 10 samples per population
   clonecorrect(~MCG/Region/Source/Host/Year, keep = 1) %>%
@@ -133,10 +135,10 @@ Okay, maybe that heirarchy is a bit... detailed. What happens if we go the
 opposite way? What if we simply clone-corrected just on MCG?
 
 ```{r by-mcg-cc-bomb, cache = TRUE}
-dat11 %>% 
+dat11 %>%
   setPop(~MCG) %>%                   # set population to MCGs
   selPopSize(n = 10) %>%             # constrain to 10 samples per population
-  clonecorrect(~MCG) %>% 
+  clonecorrect(~MCG) %>%
   poppr(sample = 999, total = FALSE) # test index of association for each pop
 ```
 
@@ -144,7 +146,7 @@ dat11 %>%
 Okay. So far, we have no evidence for this hypothesis. But one of the issues
 that we saw in Kamvar et al. 2017 was that these data reflected a clonal
 population structure. One thing that I'm curious about is the results that were
-obtained by @prugnolle2010apparent showing that individuals sampled from 
+obtained by @prugnolle2010apparent showing that individuals sampled from
 differentiated populations will have a lower index of association. I can test
 this by simulating data.
 
@@ -165,7 +167,7 @@ initially simulated from a multinomial distribution, but this often results in
 extremely long branches for a tree:
 
 ```{r example_sim}
-kop::pop_generator(mate_gen = 0, mu = 0.5) %>% 
+kop::pop_generator(mate_gen = 0, mu = 0.5) %>%
   aboot(sample = 1, tree = "nj", dist = "dist", quiet = TRUE) %>%
   invisible()
 ```
@@ -182,14 +184,14 @@ To avoid this, I'm parameterizing the simulations thusly:
 | Mutations/Generation (over all samples/loci) | 0.5 |
 
 The random mating serves to shorten those long terminal branches. This is
-important for ensuring that the populations we DO simulate are sufficiently 
+important for ensuring that the populations we DO simulate are sufficiently
 different from each other.
 
 ```{r create-population, cache = TRUE}
 cl <- makeCluster(4)
 registerDoParallel(cl, cores = 4)
 set.seed(2017-11-21)
-test <- foreach(seq_len(20), .combine = c, .packages = c("kop", "poppr", "dplyr", "purrr", "tibble")) %dopar% 
+test <- foreach(seq_len(20), .combine = c, .packages = c("kop", "poppr", "dplyr", "purrr", "tibble")) %dopar%
   pop_generator(n = 1000, mate_gen = 400, clone_gen = 100, mu = 0.5, verbose = FALSE)
 stopCluster(cl)
 test <- test %>%
@@ -210,7 +212,7 @@ individuals quite a bit. If we test the index of association for these
 populations, we can see that they are indeed clonal:
 
 ```{r ia-sims, cache = TRUE, dependson = "create-population"}
-poppr(test, total = FALSE, sample = 999) 
+poppr(test, total = FALSE, sample = 999)
 poppr(test, clonecorrect = TRUE, total = FALSE, strata = ~pop, sample = 999)
 ```
 
@@ -233,19 +235,19 @@ subsamples <- replicate(100, test[eval(sample_one), ])
 cl <- makeCluster(4)
 registerDoParallel(cl, cores = 4)
 set.seed(2017-11-21)
-res <- foreach(i = seq(subsamples), .combine = c, .packages = c("poppr")) %dopar% 
+res <- foreach(i = seq(subsamples), .combine = c, .packages = c("poppr")) %dopar%
   list(ia(subsamples[[i]], sample = 999, valuereturn = TRUE, plot = FALSE, quiet = TRUE))
 stopCluster(cl)
 
 # reshaping everything into a data frame
-resdf <- map(res, 1) %>% 
-  map(as.list) %>% 
+resdf <- map(res, 1) %>%
+  map(as.list) %>%
   bind_rows()
 (resdf <- bind_cols(resdf, data_frame(sims = map(res, 2))))
 ```
 
 
-> This simulation take a long time to run. When you come back to it, use the 
+> This simulation take a long time to run. When you come back to it, use the
 > function `lazierLoad("cache")` to reload all of the saved results:
 > `source("https://gist.githubusercontent.com/zkamvar/655be26d1d5bec1ac948/raw/97db57030d016a0e7a8156aa84ad02a7c8bc644c/lazierLoad.R")`
 
@@ -262,8 +264,8 @@ What do the data look like:
 
 ```{r fig.width = 10, fig.height = 5, dependson = "resample_populations"}
 ccia <- poppr(test, quiet = TRUE, total = FALSE)
-the_plot <- resdf %>% 
-  ggplot(aes(x = rbarD, fill = p.rD >= 0.05)) + 
+the_plot <- resdf %>%
+  ggplot(aes(x = rbarD, fill = p.rD >= 0.05)) +
   geom_histogram(binwidth = 0.01, position = "stack", color = "black") +
   geom_rug(aes(color = p.rD)) +
   viridis::scale_color_viridis() +
@@ -288,11 +290,11 @@ set.seed(2017-12-04)
 resampled_rbarD <- seppop(test) %>%
   map_df(resample.ia, n = 20, .id = "Population") %>%
   as_tibble()
-resampled_rbarD_res <- resampled_rbarD %>% 
-  group_by(Population) %>% 
-  summarize(rbarD = mean(rbarD)) %>% 
+resampled_rbarD_res <- resampled_rbarD %>%
+  group_by(Population) %>%
+  summarize(rbarD = mean(rbarD)) %>%
   pull(rbarD)
-the_plot + 
+the_plot +
   geom_vline(xintercept = resampled_rbarD_res, lty = 3) +
   labs(caption = expression(paste("(dashed lines: resampled ", bar(r)[d], " values)")))
 ```
@@ -307,20 +309,20 @@ and combine that with a tree of the 20 random samples overlayed on random
 samples from all populations.
 
 ```{r fig.width = 3.5, fig.height = 5}
-ridgelines <- resdf %>% 
-  select(Ia, rbarD) %>% 
-  add_column(Population = "pooled") %>% 
-  bind_rows(resampled_rbarD, .id = "Data") %>% 
-  mutate(Data = case_when(Population == "pooled" ~ "pooled", TRUE ~ "single")) %>% 
+ridgelines <- resdf %>%
+  select(Ia, rbarD) %>%
+  add_column(Population = "pooled") %>%
+  bind_rows(resampled_rbarD, .id = "Data") %>%
+  mutate(Data = case_when(Population == "pooled" ~ "pooled", TRUE ~ "single")) %>%
   # mutate(Population = case_when(
   #          grepl("unknown", Population) ~ sprintf("pop %2d", as.integer(gsub("unknown_", "", Population))),
   #          TRUE ~ Population
-  #          )) %>% 
-  group_by(Population) %>% 
-  mutate(m = mean(rbarD)) %>% 
-  arrange(m) %>% 
-  select(-m) %>% 
-  ungroup() %>% 
+  #          )) %>%
+  group_by(Population) %>%
+  mutate(m = mean(rbarD)) %>%
+  arrange(m) %>%
+  select(-m) %>%
+  ungroup() %>%
   mutate(Population = fct_inorder(Population))
 
 ## Function for desaturating colors by specified proportion
@@ -331,7 +333,7 @@ desat <- function(cols, sat=0.5) {
 
 popcolors <- setNames(adegenet::funky(nPop(test)), adegenet::popNames(test))
 
-p_ridge <- ggplot(ridgelines, aes(x = rbarD, y = Population, fill = Population, height = ..density..)) + 
+p_ridge <- ggplot(ridgelines, aes(x = rbarD, y = Population, fill = Population, height = ..density..)) +
   geom_density_ridges(scale = 5) +
   theme_ridges(font_size = 16, font_family = "Helvetica", grid = TRUE, center_axis_labels = TRUE) +
   scale_x_continuous(limits = c(NA, 0.4), breaks = c(0, 0.2, 0.4)) +
@@ -364,7 +366,7 @@ trees created from within-population subsample.
 ```{r treecomparison, fig.width = 6, fig.height = 3.5}
 s1 <- subsamples[[1]]
 set.seed(2017-12-04)
-samps <- data_frame(pop = pop(test), ind = indNames(test)) %>% 
+samps <- data_frame(pop = pop(test), ind = indNames(test)) %>%
   filter(!ind %in% indNames(s1)) %>%
   group_by(pop) %>%
   sample_n(19) %>%
@@ -378,11 +380,11 @@ newedge <- seq(ftree$edge) %in% which.edge(ftree, tail(samps$ind, 20))
 ew      <- ifelse(newedge, 2, 1)
 ec      <- ifelse(newedge, "black", transp("grey50", 0.5))
 maintree <- function(){
-  plot.phylo(ftree, 
-             type = "unrooted", 
-             show.tip.label = FALSE, 
-             no.margin = TRUE, 
-             edge.width = ew, 
+  plot.phylo(ftree,
+             type = "unrooted",
+             show.tip.label = FALSE,
+             no.margin = TRUE,
+             edge.width = ew,
              edge.color = ec)
   tiplabels(pch = 21, bg = fullcol, col = NA, cex = fullsize)
   add.scale.bar(length = 0.1, lwd = 2)
@@ -390,12 +392,12 @@ maintree <- function(){
 subtrees <- function(){
   for (i in popNames(test)){
     inds <- samps$ind[samps$pop == i]
-    test[inds] %>% 
+    test[inds] %>%
       diss.dist(percent = TRUE) %>%
       nj() %>%
-      plot.phylo(type = "unrooted", 
-                 show.tip.label = FALSE, 
-                 no.margin = TRUE, 
+      plot.phylo(type = "unrooted",
+                 show.tip.label = FALSE,
+                 no.margin = TRUE,
                  edge.width = 2,
                  edge.color = cols[i])
     add.scale.bar(length = 0.1, lwd = 2)
@@ -426,7 +428,7 @@ rando_points <- function(N = 20, x, y, xm, ym, spread = 25){
   rY <- rY + ( rY * c(-spread, spread) * 1/ym)
   X <- runif(N, rX[1], rX[2])
   Y <- runif(N, rY[1], rY[2])
-  points(X, Y, pch = 21, col = c(adegenet::transp(rep("grey30", N - 1), 0.5), "black"), 
+  points(X, Y, pch = 21, col = c(adegenet::transp(rep("grey30", N - 1), 0.5), "black"),
          bg = c(adegenet::transp(rep("white", N - 1), 0.5), "grey30"))
 }
 
@@ -445,24 +447,24 @@ plot_fields <- function(N = 100, P = 20, S = 20, space = 500, spread = 25){
       counter <- stop + 1
     }
   }
-  
-  pops <- res %>% 
+
+  pops <- res %>%
     as_data_frame() %>%
     set_names(c("x", "y", "xm", "ym")) %>%
     add_column(group = rep(seq.int(P), each = N))
-  
+
   islands <- pops %>%
     group_by(group) %>%
     summarize(X = mean(x), Y = mean(y), rad = sd(x))
-  
+
   opar <- par(no.readonly = TRUE)
   on.exit(par(opar))
   par(mar = rep(0.1, 4))
-  
+
   # creating background
-  symbols(islands$X, islands$Y, 
-          circles = islands$rad * 10, 
-          inches = FALSE, 
+  symbols(islands$X, islands$Y,
+          circles = islands$rad * 10,
+          inches = FALSE,
           bg = adegenet::funky(P),
           asp = 1,
           bty = "n",
@@ -478,11 +480,11 @@ plot_fields <- function(N = 100, P = 20, S = 20, space = 500, spread = 25){
     col = "white",
     border = NA
     )
-  
+
   # Drawing "islands"
-  symbols(islands$X, islands$Y, 
-          circles = islands$rad * 10, 
-          inches = FALSE, 
+  symbols(islands$X, islands$Y,
+          circles = islands$rad * 10,
+          inches = FALSE,
           bg = adegenet::funky(P),
           asp = 1,
           bty = "n",
@@ -506,7 +508,7 @@ plot_fields(space = 500)
 I can use plot_grid from cowplot to combine the main tree and the ridgeline density plot.
 
 ```{r fig.width = 6, fig.height = 6}
-# p <- plot_grid(function() plot_fields(space = 1000), maintree, p_ridge + theme(legend.position = "none"), 
+# p <- plot_grid(function() plot_fields(space = 1000), maintree, p_ridge + theme(legend.position = "none"),
 #                ncol = 2,
 #                rel_heights = c(0.5, 0.5, 0.5),
 #                rel_widths = c(1, 0.4, 0.6),
@@ -514,23 +516,23 @@ I can use plot_grid from cowplot to combine the main tree and the ridgeline dens
 # p
 set.seed(2017-12-05)
 p <-  cowplot::ggdraw(xlim = c(0, 1), ylim = c(-0.25, 1)) +
-  cowplot::draw_plot(function() plot_fields(N = 1000, space = 500, spread = 70), 
-                     x = 0.125, 
-                     y = 0.33, 
-                     height = 0.66, 
+  cowplot::draw_plot(function() plot_fields(N = 1000, space = 500, spread = 70),
+                     x = 0.125,
+                     y = 0.33,
+                     height = 0.66,
                      width = 0.75) +
-  cowplot::draw_plot(p_ridge + theme(legend.position = "none") + theme(asp = 1), 
-                     x = 0.5, 
-                     y = -0.25, 
-                     height = 0.33 + 0.25, 
+  cowplot::draw_plot(p_ridge + theme(legend.position = "none") + theme(asp = 1),
+                     x = 0.5,
+                     y = -0.25,
+                     height = 0.33 + 0.25,
                      width = 0.6) +
-  cowplot::draw_plot(maintree, 
-                     x = 0.025, 
-                     y = -0.225, 
-                     width = 0.5, 
+  cowplot::draw_plot(maintree,
+                     x = 0.025,
+                     y = -0.225,
+                     width = 0.5,
                      height = 0.33 + 0.25) +
-  cowplot::draw_plot_label(c("A", "B", "C"), 
-                           x = c(0.025, 0.025, 0.55), 
+  cowplot::draw_plot_label(c("A", "B", "C"),
+                           x = c(0.025, 0.025, 0.55),
                            y = c(0.975, 0.35, 0.35), size = 25)
 p
 ggsave(filename = here::here("results/figures/iatree.pdf"), plot = p, width = 6, height = 6)
