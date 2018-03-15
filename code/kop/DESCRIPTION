@@ -9,8 +9,8 @@ Authors@R: c(person(c("Zhian", "N."), "Kamvar", role = c("cre", "aut"),
 Maintainer: Zhian N. Kamvar <zkamvar@gmail.com>
 Description: The package 'kop' stands for "King of Pop" (RIP MJ) because it is
   designed to quickly generate populations without very much effort much like
-  Michael Jackson was able to brilliantly generate memorable and quailty pop
-  music. 
+  Michael Jackson was able to brilliantly generate memorable and quality pop
+  music.
 Depends: R (>= 3.4.2)
 License: MIT + file LICENSE
 Encoding: UTF-8
