@@ -4,7 +4,11 @@ PDF      := $(patsubst %.md,pdf/%.pdf,$(TARGETS))
 TEX      := $(patsubst %.md,pdf/%.tex,$(TARGETS))
 DOCX     := $(patsubst %.md,docx/%.docx,$(TARGETS))
 TEMPLATE := Helvetica-Garamond.docx
-PANDARGS := --from markdown --smart --standalone -F pandoc-citeproc
+ifeq ("$(shell pandoc --version | grep -c 'pandoc 2')","1")
+	PANDARGS := --from markdown+smart --standalone -F pandoc-citeproc
+else
+	PANDARGS := --from markdown --smart --standalone -F pandoc-citeproc
+endif
 
 .PHONY: all
 all : review.docx review.pdf
@@ -21,11 +25,11 @@ pdf/%.tex : %.md pandoc.css references.bib | pdf
 review.tex : pdf/review.tex correct-authors.tex formatted-citations.tex | pdf
 	sed "s/^.author/\\\\input{correct-authors.tex}%\\\\author/" $< \
 	| sed "s/^.institute/%\\\\institute/" > review.tex
-	bash replace-citations.sh
+	# bash replace-citations.sh
 
 review.docx : review.tex
 	pandoc --to docx \
-       --reference-docx=$(TEMPLATE) \
+       --reference-doc=$(TEMPLATE) \
 			 --output $@ $<
 
 review.pdf : review.tex
