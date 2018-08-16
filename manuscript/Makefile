@@ -34,6 +34,7 @@ review.docx : review.tex
 review.pdf : review.tex
 	sed "s/.png/.pdf/" $< | sed "s/-small.pdf/.png/" > review-pdf.tex
 	pdflatex review-pdf
+	pdflatex review-pdf
 	mv review-pdf.pdf review.pdf
 
 .PHONY: clean
