@@ -263,6 +263,7 @@ For the past 20 years, we have been using mycelial compatibility as a tool when 
 # Acknowledgements
 
 We would like to thank Gerard Adams for stimulating discussions on the nature of vegetative compatibility in filamentous fungi.
+We additionally would like to thank two anonymous reviewers for their comments that improved the clarity of the final manuscript.
 
 # Funding Sources
 
