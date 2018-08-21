@@ -127,7 +127,7 @@
             <text variable="publisher-place"/>
             <group delimiter=" ">
               <label variable="page" form="short" strip-periods="true"/>
-              <text variable="page"/>
+              <text variable="page" suffix="."/>
             </group>
           </group>
         </if>
@@ -147,9 +147,9 @@
                   <text variable="container-title" form="short" strip-periods="true"/>
                   <group delimiter=":">
                     <text variable="volume" suffix=":"/>
-                    <text variable="page"/>
+                    <text variable="page" suffix="."/>
                   </group>
-                  <text prefix=". doi: " variable="DOI"/>
+                  <text prefix=" doi: " variable="DOI"/>
                 </group>
               </group>
             </if>
@@ -202,7 +202,7 @@
             <text variable="container-title" form="short"/>
             <group delimiter=":">
               <text variable="volume"/>
-              <text variable="page"/>
+              <text variable="page" suffix="."/>
             </group>
           </group>
         </else>
