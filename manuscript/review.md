@@ -161,7 +161,7 @@ Consider that there are as few as eight and as many as 44 genes controlling myce
 If this is the case, why do we consider recombination to be the cause of these incongruent MCG/haplotype relationships?
 These decoupling patterns via recombination may be plausible in small populations with fixed alleles at several loci controlling mycelial compatibility.
 For instance, a recent study found a total of 15 MCG, but only seven of them were congruent, which may suggest four loci controlling mycelial compatibility segregating in the population [@Attanayake2012-mq].
-However, considering that identical MCG from disparate regions and haplotypes have been found, this explanation does not scale well [@Kohli1992-pe; @Ford1995-wk; @Kamvar2017-cl].
+However, considering that identical MCG from both disparate regions and different haplotypes have been found, this explanation does not scale well---even considering the potential for migration via agricultural mechanisms [@Kohli1992-pe; @Ford1995-wk; @Kamvar2017-cl].
 
 A recent hypothesis suggests that MCG constitute distinct populations.
 In their recent review, Lehner and Mizubuti [@Lehner2017-ny]—while addressing the issue of apparent recombination within tropical regions—proposed that MCG would impose a barrier for genetic exchange and thus, MCG represent groups of recombining individuals.
