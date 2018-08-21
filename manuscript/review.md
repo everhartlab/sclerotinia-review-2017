@@ -194,7 +194,7 @@ Mycelial compatibility groups in the *S. sclerotiorum* literature have roughly r
 ## Are haplotype and MCG better together?
 
 Because genetic markers are heritable, we are able to assess the relationships between our samples, which can tell us something about the underlying genetic structure of the populations.
-As *S. sclerotiorum* is largely considered to be a clonal pathogen, taking into account the haplotypic structure is also very important in assessing the clonal dynamics [@Arnaud-Haond2007-zo; @Grunwald2017-wd].
+As *S. sclerotiorum* has the capacity for clonal reproduction, taking into account the haplotypic structure is also very important in assessing the clonal dynamics [@Arnaud-Haond2007-zo; @Grunwald2017-wd].
 This is usually performed by borrowing tools from ecology to analyze the density and distribution of duplicated haplotypes in a population.
 Both haplotypes and MCG were previously considered to be independent and, thus could be combined in order to elucidate the true distribution of clones [@Kohn1991-wq].
 In practice, depending on the type of MLG/haplotype interactions observed, this technique renders the exact same distribution as haplotypes (in the case of trans-haplotype relationships, Fig. \ref{fig:mcg-figure}B) or a more diverse distribution (in the case of trans-MCG relationships, Fig. \ref{fig:mcg-figure}C).
