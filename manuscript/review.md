@@ -16,7 +16,7 @@ csl: springer-basic-author-date-no-et-al.csl
 abstract: |
   Mycelial compatibility, the ability for fungal isolates to grow together and form one single colony, was defined for *Sclerotinia sclerotiorum* nearly 30 years ago and has since been used as a marker to describe clonal variation in population genetic studies.
   While evidence suggests an associative relationship between mycelial compatibility and vegetative compatibility, contemporary research has treated these traits as analogous.
-  As molecular markers have been developed to describe genetic variation, researchers combined these with the mycelial compatibility groups to assess to define clonal lineages.
+  As molecular markers have been developed to describe genetic variation, researchers combined these with the mycelial compatibility groups to assess and define clonal lineages.
   However, several inconsistent relationships between mycelial compatibility groups, haplotypes, and even vegetative compatibility groups have been observed throughout the literature, suggesting that mycelial compatibility may not accurately reflect self-recognition.
   We argue that the *Sclerotinia* community needs to move beyond using MCG data in
   population genetic studies.
@@ -26,7 +26,7 @@ Key Words: vegetative compatibility, microsatellite genotyping
 
 # A brief introduction to vegetative compatibility
 
-Vegetative compatibility is a trait in eukaryotes that allows to individuals to fuse and grow as one; it is often seen as a self-recognition system [@Leslie1993-hj; @Glass2000-cg].
+Vegetative compatibility is a trait in eukaryotes that allows two individuals to fuse and grow as one; it is often seen as a self-recognition system [@Leslie1993-hj; @Glass2000-cg].
 In fungi, this process of fusion between hyphae is known as anastomosis.
 Incompatible reactions from non-self recognition, result in a barrage line: a band of melanized and/or dead tissue at the contact zone between isolates [@Leslie1993-hj; @Glass1992-af; @Glass2000-cg; @Strom2016-di].
 The barrage line, however is one of four possible states in hyphal contact—C0, no contact; C1, hyphal contact without fusion; C2, fusion with subsequent killing reaction; and C4, fusion with a stable heterokaryon [@Carling1988-xk].
@@ -41,7 +41,7 @@ This was used in *Fusarium oxysporum* to collate over 100 forma specialis based 
 One of the most powerful applications of VCG has been shown in the clonal pathogen *Aspergillus flavus*.
 This pathogen showed little to no gene flow between VCG [@Grubisha2010-ld].
 As it was found that VCG could delineate aflatoxin-producing strains, researchers showed that non-aflatoxin-producing strains could reliably be used as a biocontrol agent [@Atehnkeng2016-qb; @Strom2016-di].
-For many fungal species, before the advent of molecular genetic markers, VCG have been routinely used to identify clonal lineages within populations.
+For many fungal species, before the advent of molecular genetic markers, VCG were routinely used to identify clonal lineages within populations.
 
 # Mycelial compatibility in *Sclerotinia sclerotiorum*
 
@@ -50,28 +50,28 @@ Mycelial compatibility was defined as the ability for two isolates to grow toget
 Attempts at assessing vegetative compatibility directly through mutagenesis were made, but only one was successful with a small sub-sample of isolates [@Kohn1990-po; @Ford1995-wk].
 Despite an initial definition indicating that mycelial compatibility was a subset of vegetative compatibility, several contemporary publications treat them as analogous [@Kohn1990-po; @Schafer2006-ph; @Lehner2017-ny].
 
-Not long after the initial definition of Mycelial Compatibility Groups (MCG) for *S. sclerotiorum*, these were paired with haplotype fingerprint (RFLP) profiles, and showed near concordance between the two [@Kohn1991-wq].
+Not long after the initial definition of Mycelial Compatibility Groups (MCG) for *S. sclerotiorum*, these were paired with restriction fragment length polymorphism (RFLP) fingerprint profiles, and showed near concordance between the two [@Kohn1991-wq].
 Due to the diversity of MCG, subsequent studies have also found concordance, but it did not take long for uncoupling of genotype and compatibility group to be reported (Table \ref{tab:meta}).
 While the genetic component of non-self recognition is still not fully understood in *S. sclerotiorum*, 44 candidate genes have recently been identified, which may explain the diversity of MCG found across studies [@Wu2017-dx].
 
+Table: \label{tab:meta} A selection of studies that included both MCG and MLH characterization of *Sclerotinia sclerotiorum* in their analysis and results of their work.
+N = number of samples, MLH = number of multilocus haplotypes, MCG = number of mycelial compatibility groups, MCG concordance = number of MCG that belonged to a single MLH.
 
 Study                       N  MLH  MCG  MCG concordance
 ----------------------- ----- ---- ---- ----------------
-@Kohn1991-wq              63   33   32          31/32
-@Kohli1992-pe             66   39   36          33/36
-@Cubeta1997-rr            84   50   41          32/41
-@Carbone2001-hi           64   19   15          7/15
-@Hambleton2002-an         213  41   21          16/21
-@Atallah2004-es           167  145  82          NA
-@Malvarez2007-jo          294  152  141         130/141
-@Attanayake2012-mq        40   16   15          7/15
-@Barari2012-dn            65   44   26          22/26
-@Lehner2015-oj            118  70   14          4/14
-@Lehner2017-mm            187  46   34          24/34
-@Kamvar2017-cl            366  165  87          15/87
-
-Table: \label{tab:meta} A selection of studies that included both MCG and MLH characterization of *Sclerotinia sclerotiorum* in their analysis and results of their work.
-N = number of samples, MLH = number of multilocus haplotypes, MCG = number of mycelial compatibility groups, MCG concordance = number of MCG that belonged to a single MLH.
+@Kohn1991-wq               63   33   32            31/32
+@Kohli1992-pe              66   39   36            33/36
+@Cubeta1997-rr             84   50   41            32/41
+@Carbone2001-hi            64   19   15             7/15
+@Hambleton2002-an         213   41   21            16/21
+@Atallah2004-es           167  145   82               NA
+@Malvarez2007-jo          294  152  141          130/141
+@Attanayake2012-mq         40   16   15             7/15
+@Barari2012-dn             65   44   26            22/26
+@Lehner2015-oj            118   70   14             4/14
+@Lehner2017-mm            187   46   34            24/34
+@Kamvar2017-cl            366  165   87            15/87
+--------------------------------------------------------
 
 
 In this review, we will address inconsistencies between haplotype and MCG assignments, discuss proposed hypotheses that explain these patterns, and suggest a path forward for future population genetic studies of *S. sclerotiorum*.
@@ -82,7 +82,7 @@ The first step is to acknowledge the fact that mycelial compatibility is not equ
 Mycelial compatibility in *S. sclerotiorum* is considered by some to be synonymous with vegetative compatibility [@Schafer2006-ph; @Kohn1990-po], yet evidence to the contrary exists in *S. sclerotiorum* [@Ford1995-wk], *S. homoeocarpa* [@Jo2008-ft; @Chang2014-rn], *Verticillium dalhiae* [@Papaioannou2014-pe], and *Neurospora crassa* [@Micali2003-li].
 The crux in these cases is that barrage formation may only serve as indirect evidence for vegetative incompatibility.
 In order to be absolutely certain anastomosis has taken place, the most efficient method is to pair complementary auxotrophic nitrate non-utilizing (*nit*-) mutants on minimal media [@Kohn1990-po; @Ford1995-wk; @Leslie1993-hj; @Glass1992-af].
-Vegetatively compatible strains would anastomose and produce aerial hyphae and regain wildtype growth patterns, whereas incompatible strains would fail to grow larger than the control strains, which were spindly and failed to produce aerial hyphae.
+Vegetatively compatible strains anastomose and produce aerial hyphae and regain wildtype growth patterns, whereas incompatible strains fail to grow larger than the control strains, which are spindly and fail to produce aerial hyphae.
 Unfortunately, *S. sclerotiorum* has proven notoriously difficult to mutate, which is the reason this technique has not yet been applied to determine mycelial compatibility [@Kohn1990-po; @Ford1995-wk].
 To date, only one study has been able to create auxotrophic mutants to test for anastomosis and heterokaryosis in *S. sclerotiorum* [@Ford1995-wk].
 
@@ -113,7 +113,7 @@ C) trans-MCG relationship: one haplotype, two MCG showing a barrage reaction bet
 
 The first study to compare *S. sclerotiorum* MCG with haplotypes analyzed 63 isolates via RFLP probes in both nuclear and mitochondrial
 DNA, detected 32 MCG and 33 haplotypes[^1] [@Kohn1991-wq].
-Nearly all relationships were observed were congruent, with the exception of one MCG that exhibited a trans-haplotype relationship; the two isolates that comprised that MCG expressed different haplotypes for the mitochondrial probe.
+Nearly all relationships observed were congruent, with the exception of one MCG that exhibited a trans-haplotype relationship; the two isolates that comprised that MCG expressed different haplotypes for the mitochondrial probe.
 Ultimately, it was concluded that MCG represented unique clones.
 In 1992, a study of 66 isolates comprising 36 MCG and 39 haplotypes showed three MCG exhibited trans-haplotype relationships [@Kohli1992-pe].
 The authors suggested that because it was unlikely that the same MCG would arise by chance in different isolates AND the probability of sharing the same haplotype was 1 in a million, clones should be determined by the combination of MCG and haplotype.
@@ -121,7 +121,7 @@ Since it was impossible to ascertain inheritance from the probes used (and thus 
 
 Inconsistencies began to appear in subsequent studies of genetic diversity using both molecular markers and MCG.
 For example, Cubeta et al. [-@Cubeta1997-rr] surveyed 100 isolates from North Carolina and Louisiana, USA.
-They found all three MCG to haplotype relationships, where—out of 41 MCG—32 were congruent relationships, 10 MCG had a trans-haplotype relationship with more than one haplotype and two haplotypes had a trans-MCG relationship with more than one MCG identified and confirmed across two laboratories.
+They found all three MCG to haplotype relationships in North Carolina, where—out of 41 MCG—32 were congruent relationships, 10 MCG had a trans-haplotype relationship with more than one haplotype and two haplotypes had a trans-MCG relationship with more than one MCG identified and confirmed across two laboratories.
 The trans-haplotype relationships were hypothesized to be due to transposition in one of the probes and the trans-MCG relationships were thought to represent partial compatibility, driven by a match at some, but not all *het* loci [@Cubeta1997-rr].
 
 No studies since Kohn et al. [-@Kohn1991-wq] have shown a 1:1 relationship between haplotype and MCG (Table 1).
@@ -142,7 +142,7 @@ Here, we will highlight two of them and briefly explore their strengths and weak
 Perhaps one of the most widely recognized hypotheses is that a decoupling of MCG and haplotype is a sign of recombination [@Kohli1992-pe; @Milgroom1996-we; @Phillips2002-pq; @Schafer2006-ph].
 This concept has been demonstrated in the chestnut blight fungus *Cryphonectria parasitica* by comparing genetic similarity within VCG to randomly-assigned groups [@Milgroom1996-we; @Liu1996-dr].
 Using this hypothesis, Schafer and Kohn [@Schafer2006-ph] specified expected relationships between MCG and haplotype under different reproductive scenarios.
-Clonal populations are expected to correlated 1:1 or have closely related haplotypes within MCG due to clonal expansion.
+Clonal populations are expected to correlate 1:1 or have closely related haplotypes within MCG due to clonal expansion.
 However, in recombining populations, “...except for isolates from adjacent plants, the expectation is that each isolate sampled is either incompatible with all other isolates or is part of an intransitive[^2] MCG and each isolate either has a unique fingerprint or a fingerprint associated with more than one MCG” [@Schafer2006-ph].
 
 ![
@@ -159,9 +159,9 @@ Decoupling due to recombination is possible and expected in fungal species with 
 However, in *S. sclerotiorum*, we are more likely to observe entirely unique genotypes and MCG.
 Consider that there are as few as eight and as many as 44 genes controlling mycelial compatibility; the odds of expressing the exact same MCG or genotype through independent recombination events are low [@Kohli1992-pe; @Wu2017-dx].
 If this is the case, why do we consider recombination to be the cause of these incongruent MCG/haplotype relationships?
-These decoupling patterns via recombination are may be plausible in small populations with fixed alleles at several loci controlling mycelial compatibility.
+These decoupling patterns via recombination may be plausible in small populations with fixed alleles at several loci controlling mycelial compatibility.
 For instance, a recent study found a total of 15 MCG, but only seven of them were congruent, which may suggest four loci controlling mycelial compatibility segregating in the population [@Attanayake2012-mq].
-However, considering that identical MCG from disparate regions and haplotypes have been found, this explanation does not scale well [@Kohli1992-pe; @Ford1995-wk; @Kamvar2017-cl].
+However, considering that identical MCG from both disparate regions and different haplotypes have been found, this explanation does not scale well---even considering the potential for migration via agricultural mechanisms [@Kohli1992-pe; @Ford1995-wk; @Kamvar2017-cl].
 
 A recent hypothesis suggests that MCG constitute distinct populations.
 In their recent review, Lehner and Mizubuti [@Lehner2017-ny]—while addressing the issue of apparent recombination within tropical regions—proposed that MCG would impose a barrier for genetic exchange and thus, MCG represent groups of recombining individuals.
@@ -178,9 +178,9 @@ Black, solid arrows represent direct causal relationships and grey, dashed arrow
 
 One possibility for identical haplotypes across MCG could be explained by exogenous forces capable of altering mycelial compatibility reactions.
 A virus capable of switching on mycelial compatibility was recently discovered [@Wu2017-dx].
-This virus is named *Sclerotinia sclerotiorum* mycoreovirus 4 (SsMYRV4) has been demonstrated to force two incompatible strains to become compatible by modifying expression of *het* genes and preventing apoptosis at the junction between the two strains.
+*Sclerotinia sclerotiorum* mycoreovirus 4 (SsMYRV4) has been demonstrated to force two incompatible strains to become compatible by modifying expression of *het* genes and preventing apoptosis at the junction between the two strains.
 It’s hypothesized that this facilitates viral transmission between hosts.
-This study has identified up to 44 putative genes involved in incompatibility reactions, but showed that the reaction can be modified through expression.
+This study identified up to 44 putative genes involved in incompatibility reactions, but showed that the reaction can be modified through expression.
 Thus, while mycelial compatibility may utilize the machinery of vegetative compatibility, there is evidence that it may still be altered by exogenous forces (Fig. \ref{fig:process}).
 The extent to which this virus or other exogenous forces may play a role in mycelial compatibility interactions remains uncharacterized.
 
@@ -194,7 +194,7 @@ Mycelial compatibility groups in the *S. sclerotiorum* literature have roughly r
 ## Are haplotype and MCG better together?
 
 Because genetic markers are heritable, we are able to assess the relationships between our samples, which can tell us something about the underlying genetic structure of the populations.
-As *S. sclerotiorum* is largely considered to be a clonal pathogen, taking into account the haplotypic structure is also very important in assessing the clonal dynamics [@Arnaud-Haond2007-zo; @Grunwald2017-wd].
+As *S. sclerotiorum* has the capacity for clonal reproduction, taking into account the haplotypic structure is also very important in assessing the clonal dynamics [@Arnaud-Haond2007-zo; @Grunwald2017-wd].
 This is usually performed by borrowing tools from ecology to analyze the density and distribution of duplicated haplotypes in a population.
 Both haplotypes and MCG were previously considered to be independent and, thus could be combined in order to elucidate the true distribution of clones [@Kohn1991-wq].
 In practice, depending on the type of MLG/haplotype interactions observed, this technique renders the exact same distribution as haplotypes (in the case of trans-haplotype relationships, Fig. \ref{fig:mcg-figure}B) or a more diverse distribution (in the case of trans-MCG relationships, Fig. \ref{fig:mcg-figure}C).
@@ -203,7 +203,7 @@ However, due to the potentially non-independent nature of MCG, we strongly advis
 Both MCG and genetic markers can be used to identify clones in a population.
 While the main use of MCG has been for self/nonself determination, there is clear documented evidence of non-self isolates producing a compatible reaction and vice-versa [@Ford1995-wk; @Leslie1996-di; @Wu2017-dx].
 While this problem exists with molecular markers, the implications differ.
-Identical haplotypes are generally considered to be the same individual, however, haplotypes can be identical in state without being identical by descent or mutation can render two otherwise identical genotypes different [@Parks1993-nv; @Arnaud-Haond2007-zo].
+Identical haplotypes are generally considered to be the same individual, however, haplotypes can be identical in state without being identical by descent or mutation rendering two otherwise identical genotypes different [@Parks1993-nv; @Arnaud-Haond2007-zo].
 
 While both of these markers suffer from uncertainty, haplotypes have a clear advantage over MCG as there are ways to quantify the uncertainty.
 For example, to handle the presence of highly variable loci or missing data, one can use a genetic distance threshold to group similar haplotypes that may be part of a clonal lineage [@Arnaud-Haond2007-zo; @Kamvar2015-ff; @Bailleul2016-lw].
@@ -225,7 +225,7 @@ Microsatellite loci are known to differ from study to study, but these differenc
 This means that 1) the difference should be relative across all allele calls between studies and 2) if representative isolates—the minimal number of isolates that would capture all alleles observed in a study, which could represent a small fraction of the number of unique haplotypes—from several studies were re-sequenced together, it is possible to adjust historical and future data to match the allele calls of the reference panel.
 Thus, while there is no current reference panel of microsatellite haplotypes, it is possible to achieve this with a large enough selection of isolates representing known variation at each locus and requiring only a minimal amount of additional cost and effort to include as standards in any genotyping study.
 In contrast, a MCG representative panel would require all represented groups from all studies to be compared together.
-Moreover, MCG tester strains would necessarily need to be shared as living biological material, limiting access due to hazardous material import policies; genotype panels, on the other hand, can be shared as purified genomic DNA.
+Moreover, MCG tester strains would need to be shared as living biological material, limiting access due to hazardous material import policies; genotype panels, on the other hand, can be shared as purified genomic DNA.
 
 ## Recommended Practices
 
@@ -263,6 +263,7 @@ For the past 20 years, we have been using mycelial compatibility as a tool when 
 # Acknowledgements
 
 We would like to thank Gerard Adams for stimulating discussions on the nature of vegetative compatibility in filamentous fungi.
+We additionally would like to thank two anonymous reviewers for their comments that improved the clarity of the final manuscript.
 
 # Funding Sources
 
