@@ -27,7 +27,7 @@ The manuscript was originally written in Google Docs with the Paperpile plugin
 for citations for the sake of an easy collaboration tool. Because there were
 some formatting issues with the citations in Paperpile, we had downloaded the
 [citations in BibTeX format](manuscript/references.bib)  and the [manuscript as
-a word doc](manuscript/MCG\ Review\ -\ BibTeX.docx) with  BibTeX citation codes.
+a word doc](manuscript/MCG%20Review%20-%20BibTeX.docx) with  BibTeX citation codes.
 This was then converted to markdown with pandoc with the BibTeX citation codes
 translated to pandoc citation codes, yaml headers added, and tables and figures
 interspersed within the [markdown manuscript](manuscript/review.md).
